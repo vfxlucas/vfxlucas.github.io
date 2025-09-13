@@ -8,14 +8,14 @@
 }
 
 html {
-    scrollbar-gutter: stable both-edges;
+    scrollbar-gutter: stable;
 }
 
 :root {
-    --bg: #0f0f0f;
+    --bg: #000000;
     --bg-soft: #1a1a1a;
     --fg: #fff;
-    --muted: rgba(255, 255, 255, .65);
+    --muted: rgba(182, 182, 182, 0.65);
     --line: rgba(255, 255, 255, .12);
     --accent: #ffffff;
 
@@ -64,7 +64,7 @@ body {
     inset: 0 0 auto 0;
     height: var(--header-h);
     z-index: 100;
-    background: rgba(15, 15, 15, .75);
+    background: rgba(25, 25, 25, 0.75);
     border-bottom: 1px solid var(--line);
     backdrop-filter: blur(8px);
 }
@@ -264,14 +264,14 @@ body {
     inset: var(--header-h) 0 0 0;
     z-index: 0;
     pointer-events: none;
-    --pattern-strong: rgba(255, 255, 255, 0.04);
+    --pattern-strong: rgba(255, 255, 255, 0.01);
     --pattern-fine: rgba(255, 255, 255, 0.02);
-    background-color: #141414;
+    background-color: #080808;
     background-image:
         linear-gradient(var(--pattern-strong) 2px, transparent 2px),
         linear-gradient(90deg, var(--pattern-strong) 2px, transparent 2px),
         linear-gradient(var(--pattern-fine) 1px, transparent 1px),
-        linear-gradient(90deg, var(--pattern-fine) 1px, #141414 1px);
+        linear-gradient(90deg, var(--pattern-fine) 1px, #080808 1px);
     background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
     background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
 }
@@ -487,7 +487,7 @@ body {
 
 /* ===== Card de proyecto ===== */
 .card {
-    background: rgba(30, 30, 30, .9);
+    background: rgba(25, 25, 25, 0.75);
     border: 1px solid var(--line);
     border-radius: 16px;
     overflow: hidden;
@@ -757,7 +757,7 @@ body {
 
 @keyframes modalIn {
     from {
-        transform: scale(.98);
+        transform: scale(0);
         opacity: .7;
     }
 

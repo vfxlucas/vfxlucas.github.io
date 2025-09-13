@@ -91,10 +91,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             const url = new URL(input);
             if (url.hostname.includes("vimeo.com")) {
                 const parts = url.pathname.split("/").filter(Boolean);
-                // player.vimeo.com/video/{id}  OR  vimeo.com/{id}
-                const idx = parts.indexOf("video");
+                const idx = parts.indexOf("video"); // player.vimeo.com/video/{id}
                 if (idx !== -1 && parts[idx + 1]) return parts[idx + 1];
-                if (parts.length >= 1 && /^\d+$/.test(parts[0])) return parts[0];
+                if (parts.length >= 1 && /^\d+$/.test(parts[0])) return parts[0]; // vimeo.com/{id}
             }
         } catch { }
         return null;
@@ -102,9 +101,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function makeInfo(label, value) {
         const v = (value ?? "").toString();
-        if (v.trim() === "") return ""; // si viene vacío, no pintamos la fila
+        if (v.trim() === "") return "";
         const isChange = v.trim().toUpperCase() === "CHANGE";
-        return `<li class="${isChange ? 'is-missing' : ''}"><strong>${label}:</strong> ${v}</li>`;
+        return `<li class="${isChange ? "is-missing" : ""}"><strong>${label}:</strong> ${v}</li>`;
     }
 
     function makeCard(p) {
@@ -123,33 +122,33 @@ document.addEventListener("DOMContentLoaded", async () => {
             ? `https://vimeo.com/${vimeoId}`
             : ytId
                 ? `https://www.youtube.com/watch?v=${ytId}`
-                : (p.video_url || "");
+                : p.video_url || "";
 
-        // Thumbnail preferencia:
-        // 1) YouTube → miniatura oficial
+        // Thumbnail:
+        // 1) YouTube → miniatura
         // 2) p.thumb → imagen custom
-        // 3) Tiene videoUrl pero sin thumb → botón con play
-        // 4) No hay video → placeholder visible "NO VIDEO"
+        // 3) Con videoUrl pero sin thumb → botón con play
+        // 4) Sin vídeo → placeholder visible
         let thumbHtml = "";
         if (ytId) {
             thumbHtml = `
-        <button class="thumb" type="button" data-video="${videoUrl}">
-          <img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" alt="${p.title || "Project"} thumbnail" loading="lazy">
+        <button class="thumb thumb--clean" type="button" data-video="${videoUrl}">
+          <img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" alt="${p.title || "Project"
+                } thumbnail" loading="lazy">
           <div class="play-btn"></div>
         </button>`;
         } else if (p.thumb) {
             thumbHtml = `
-        <button class="thumb" type="button" data-video="${videoUrl}">
+        <button class="thumb thumb--clean" type="button" data-video="${videoUrl}">
           <img src="${p.thumb}" alt="${p.title || "Project"} thumbnail" loading="lazy">
           <div class="play-btn"></div>
         </button>`;
         } else if (videoUrl) {
             thumbHtml = `
-        <button class="thumb" type="button" data-video="${videoUrl}">
+        <button class="thumb thumb--clean" type="button" data-video="${videoUrl}">
           <div class="play-btn"></div>
         </button>`;
         } else {
-            // Sin vídeo → hueco visible
             thumbHtml = `
         <div class="thumb is-missing" aria-disabled="true" title="No video provided">
           <span class="missing-label">NO VIDEO</span>
@@ -164,8 +163,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         ${thumbHtml}
         <ul class="info-list">
           ${makeInfo("Studio", p.studio)}
-          ${makeInfo("Year", p.year)}
-          ${makeInfo("Directed by", p.directed_by)}
           ${makeInfo("Comp Supervisor", p.comp_supervisor)}
           ${makeInfo("Comp Lead", p.comp_lead)}
           ${makeInfo("My role", p.role)}
@@ -197,7 +194,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             });
 
-            // Clic SOLO en thumbs con data-video (los placeholders no tienen)
+            // Click en thumbnails con vídeo
             document.querySelectorAll(".thumb[data-video]").forEach((btn) => {
                 btn.addEventListener("click", () => {
                     const url = btn.getAttribute("data-video");
@@ -225,22 +222,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         const ytId = getYouTubeId(urlOrId);
         let nodeHtml = "";
 
-        // MP4/WEBM/OGG locales o CDN
         if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(urlOrId)) {
             nodeHtml = `<video src="${urlOrId}" controls autoplay playsinline></video>`;
-        }
-        // Vimeo embebido
-        else if (vimeoId) {
+        } else if (vimeoId) {
             const embed = `https://player.vimeo.com/video/${vimeoId}?autoplay=1&muted=0&controls=1&title=0&byline=0&portrait=0&dnt=1&transparent=0`;
             nodeHtml = `<iframe src="${embed}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
-        }
-        // YouTube
-        else if (ytId) {
+        } else if (ytId) {
             const embed = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`;
             nodeHtml = `<iframe src="${embed}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-        }
-        // Fallback
-        else {
+        } else {
             nodeHtml = `<iframe src="${urlOrId}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
         }
 
@@ -258,7 +248,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         media.innerHTML = ""; // parar reproducción
     }
 
-    // Abrir desde los dos hero-cards (con URLs de Vimeo)
+    // Abrir desde los dos hero-cards
     document.querySelectorAll(".hero-card").forEach((btn) => {
         btn.addEventListener("click", () => {
             const url = btn.getAttribute("data-video");
@@ -279,7 +269,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const drawerClose = mobileMenu ? mobileMenu.querySelector(".drawer-close") : null;
     const mobileBackdrop = document.getElementById("mobileBackdrop");
 
-    function isMobileMenuOpen() { return mobileMenu && mobileMenu.classList.contains("open"); }
+    function isMobileMenuOpen() {
+        return mobileMenu && mobileMenu.classList.contains("open");
+    }
 
     function openMobileMenu() {
         if (!mobileMenu || !mobileBackdrop || !burgerBtn) return;
