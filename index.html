@@ -7,6 +7,7 @@
     <title>Lucas Ramos – Portfolio</title>
 
     <link rel="stylesheet" href="index.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
     <script src="index.js" defer></script>
 </head>
 
@@ -24,6 +25,7 @@
                 <a href="#home" class="nav-link is-active" data-target="section-home" aria-current="page">Home</a>
                 <a href="#animation" class="nav-link" data-target="section-animation">Animation</a>
                 <a href="#vfx" class="nav-link" data-target="section-vfx">VFX</a>
+                <a href="#cv" class="nav-link" data-target="section-cv">CV/Breakdown</a>
                 <a href="#about" class="nav-link" data-target="section-about">About</a>
             </nav>
 
@@ -45,6 +47,7 @@
             <li><a href="#home" class="nav-link drawer-link" data-target="section-home">Home</a></li>
             <li><a href="#animation" class="nav-link drawer-link" data-target="section-animation">Animation</a></li>
             <li><a href="#vfx" class="nav-link drawer-link" data-target="section-vfx">VFX</a></li>
+            <li><a href="#cv" class="nav-link drawer-link" data-target="section-cv">CV/Breakdown</a></li>
             <li><a href="#about" class="nav-link drawer-link" data-target="section-about">About</a></li>
         </ul>
     </nav>
@@ -52,7 +55,7 @@
 
     <!-- CONTENIDO -->
     <main class="container main-content">
-        <!-- HOME: dos vídeos con texto grande centrado -->
+        <!-- HOME -->
         <section id="section-home">
             <div class="hero">
                 <!-- Animation reel -->
@@ -87,83 +90,93 @@
             <div class="grid" id="gridVfx"></div>
         </section>
 
-        <!-- ABOUT -->
+        <!-- ABOUT (rediseño contraste) -->
         <section id="section-about" class="is-hidden" aria-hidden="true">
             <h1 class="section-title">About me</h1>
 
-            <div class="about">
-                <div class="about-left">
-                    <div class="about-card">
-                        <div class="about-photo">
-                            <img src="assets/lucas.jpeg" alt="Lucas Ramos" />
-                        </div>
+            <div class="about about--contrast">
+                <!-- Perfil (claro) -->
+                <article class="about-profile card-light">
+                    <div class="profile-media">
+                        <img src="assets/lucas.jpeg" alt="Lucas Ramos portrait">
+                    </div>
 
-                        <p class="about-intro">
-                            Soy <strong>Lucas Ramos</strong>, <strong>VFX Compositor</strong> (nacido en Francia, con
-                            base en España).
-                            He trabajado en <strong>live-action</strong> y <strong>animación</strong>. Busco el
-                            equilibrio entre la
-                            <strong>exigencia técnica</strong> y la <strong>intención artística</strong> en equipos
-                            colaborativos.
+                    <div class="profile-text">
+                        <h2 class="profile-name">Lucas Ramos</h2>
+                        <p class="profile-role">Digital Compositor</p>
+                    </div>
+
+                    <a class="btn-primary" href="mailto:lucasramosvfx@gmail.com">Email me</a>
+
+                    <ul class="social-list">
+                        <!-- Cambia los SVG si tienes tus propios iconos -->
+                        <li><a href="https://www.imdb.com/" target="_blank" rel="noopener" aria-label="IMDb">
+                                <img src="assets/icon_imdb.png" alt="IMDb"></a></li>
+                        <li><a href="https://vimeo.com/" target="_blank" rel="noopener" aria-label="Vimeo">
+                                <img src="assets/icon_vimeo.png" alt="Vimeo"></a></li>
+                        <li><a href="https://www.linkedin.com/in/lucas-ramos-sivera-965699186/" target="_blank"
+                                rel="noopener" aria-label="LinkedIn">
+                                <img src="assets/icon_linkedin.png" alt="LinkedIn"></a></li>
+                    </ul>
+                </article>
+
+                <!-- Bio (oscuro) -->
+                <article class="about-bio card-dark">
+                    <h2 class="about-title">About Me</h2>
+
+                    <div class="about-copy">
+                        <p>I’m a Compositor born in France and raised in Spain with 5+ years of experience in the VFX
+                            and animation industry. Over this time, I’ve contributed to feature films, high-end series
+                            and commercials, developing strong skills in CG integration, cleanup, and look development.
                         </p>
-
-                        <ul class="about-pills">
-                            <li class="pill">Nuke</li>
-                            <li class="pill">2D/3D Compositing</li>
-                            <li class="pill">Live-action & Animation</li>
-                            <li class="pill">Roto / Prep</li>
-                        </ul>
+                        <p>My background includes working in both large international studios and smaller teams, which
+                            has taught me to adapt quickly, collaborate effectively, and handle different pipelines and
+                            workflows depending on the project’s needs.</p>
+                        <p>Most recently, I’ve been focused on expanding my experience with more complex CG-heavy shots
+                            and collaborating closely with supervisors and other departments, aiming to keep growing
+                            both technically and artistically within the industry.</p>
                     </div>
 
-
-                    <div class="about-card">
-                        <h3 class="about-subtitle">Education</h3>
-                        <ul class="about-list">
-                            <li><strong>Master in Digital Compositing for VFX</strong> — U-TAD (Madrid), 2019–2020</li>
-                            <li><strong>3D Animation, Games & Interactive Environments</strong> — Florida Universitaria
-                                (Valencia), 2017–2019</li>
-                        </ul>
+                    <div class="studio-logos">
+                        <!-- Sustituye por tus rutas reales si ya tienes SVG/PNG -->
+                        <img src="assets/logos/risefx.svg" alt="RISE FX">
+                        <img src="assets/logos/elranchito.svg" alt="El Ranchito">
+                        <img src="assets/logos/vinefx.svg" alt="Vine FX">
+                        <img src="assets/logos/illusorium.svg" alt="Illusorium Studios">
                     </div>
-
-                    <div class="about-card">
-                        <h3 class="about-subtitle">Contact</h3>
-                        <ul class="about-list">
-                            <li>Email: <a href="mailto:lucasramosvfx@gmail.com">lucasramosvfx@gmail.com</a></li>
-                            <li>Base: Spain (born in France)</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="about-right">
-                    <div class="about-card">
-                        <h3 class="about-subtitle">Selected credits</h3>
-                        <ul class="about-list">
-                            <li><strong>Guardians of the Galaxy Vol. 3</strong> — Digital Compositor @ RISE FX (2023)
-                            </li>
-                            <li><strong>The Hunger Games: The Ballad of Songbirds & Snakes</strong> — Digital Compositor
-                                @ RISE FX (2023)</li>
-                            <li><strong>The Gryphon (Der Greif)</strong> — Digital Compositor @ RISE FX (2023)</li>
-                            <li><strong>The Lazarus Project S2</strong> — Digital Compositor</li>
-                            <li><strong>The Quinta's Ghost</strong> — 3D Compositor @ Illusorium Studios (2024–2025)
-                            </li>
-                            <li><strong>Dungeon Fighter Mobile</strong> — Digital Compositor @ Illusorium Studios
-                                (2024–2025)</li>
-                            <li><strong>Secret Levels (Amazon Prime Video)</strong> — Digital Compositor @ Illusorium
-                                Studios (2024–2025)</li>
-                            <li><strong>Sky: Children of the Light</strong> — Digital Compositor @ Illusorium Studios
-                                (2024–2025)</li>
-                            <li><strong>SEE S03</strong> — Digital Compositor</li>
-                            <li><strong>Élite S05</strong> — Digital Compositor</li>
-                            <li><strong>Modelo 77</strong> — Digital Compositor</li>
-                            <li><strong>Rainbow</strong> — Digital Compositor</li>
-                            <li><strong>Las de la Última Fila</strong> — Digital Compositor</li>
-                            <li><strong>Amor de Madre</strong> — Digital Compositor</li>
-                            <li><strong>Un Asunto Privado</strong> — Digital Compositor</li>
-                        </ul>
-                    </div>
-                </div>
+                </article>
             </div>
         </section>
+
+        <!-- CV / Breakdown -->
+        <section id="section-cv" class="is-hidden" aria-hidden="true">
+            <h1 class="section-title">CV/Breakdown</h1>
+
+            <!-- Botonera (3 opciones) -->
+            <div class="cv-switch" role="tablist" aria-label="Documentos CV/Breakdown">
+                <button class="seg-btn is-active" data-doc="cv" role="tab" aria-selected="true">Curriculum
+                    Vitae</button>
+                <button class="seg-btn" data-doc="anim" role="tab" aria-selected="false">Breakdown Animation</button>
+                <button class="seg-btn" data-doc="vfx" role="tab" aria-selected="false">Breakdown VFX</button>
+            </div>
+
+            <!-- Visor grande estilo “hero card” -->
+            <article class="cv-hero">
+                <div class="cv-hero-inner" id="cvViewer">
+                    <div class="cv-canvas-wrap">
+                        <canvas></canvas>
+                    </div>
+
+                    <!-- Controles flotantes -->
+                    <div class="cv-hero-controls" aria-label="Controles de página">
+                        <button id="cvPrev" class="btn-ghost" type="button" aria-label="Página anterior">‹</button>
+                        <span id="cvPage" class="cv-hero-page">1 / 1</span>
+                        <button id="cvNext" class="btn-ghost" type="button" aria-label="Página siguiente">›</button>
+                    </div>
+                </div>
+            </article>
+        </section>
+
     </main>
 
     <!-- MODAL / LIGHTBOX -->

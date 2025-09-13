@@ -36,6 +36,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         "section-animation": document.getElementById("section-animation"),
         "section-vfx": document.getElementById("section-vfx"),
         "section-about": document.getElementById("section-about"),
+        "section-cv": document.getElementById("section-cv"),
     };
 
     function setActive(targetId) {
@@ -45,11 +46,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (isActive) a.setAttribute("aria-current", "page");
             else a.removeAttribute("aria-current");
         });
+
         Object.entries(sections).forEach(([id, el]) => {
             const show = id === targetId;
             el.classList.toggle("is-hidden", !show);
             el.setAttribute("aria-hidden", show ? "false" : "true");
         });
+
+        // Inicializador correcto del visor CV simple (3 botones)
+        if (targetId === "section-cv") initCvSimpleViewerOnce();
+
         window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
@@ -91,9 +97,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             const url = new URL(input);
             if (url.hostname.includes("vimeo.com")) {
                 const parts = url.pathname.split("/").filter(Boolean);
-                const idx = parts.indexOf("video"); // player.vimeo.com/video/{id}
+                const idx = parts.indexOf("video");
                 if (idx !== -1 && parts[idx + 1]) return parts[idx + 1];
-                if (parts.length >= 1 && /^\d+$/.test(parts[0])) return parts[0]; // vimeo.com/{id}
+                if (parts.length >= 1 && /^\d+$/.test(parts[0])) return parts[0];
             }
         } catch { }
         return null;
@@ -101,7 +107,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function makeInfo(label, value) {
         const v = (value ?? "").toString();
-        if (v.trim() === "") return "";
+        if (v.trim() === "") return ""; // no pintar si viene vacío
         const isChange = v.trim().toUpperCase() === "CHANGE";
         return `<li class="${isChange ? "is-missing" : ""}"><strong>${label}:</strong> ${v}</li>`;
     }
@@ -124,17 +130,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 ? `https://www.youtube.com/watch?v=${ytId}`
                 : p.video_url || "";
 
-        // Thumbnail:
-        // 1) YouTube → miniatura
-        // 2) p.thumb → imagen custom
-        // 3) Con videoUrl pero sin thumb → botón con play
-        // 4) Sin vídeo → placeholder visible
+        // Thumbnail preferencia
         let thumbHtml = "";
         if (ytId) {
             thumbHtml = `
         <button class="thumb thumb--clean" type="button" data-video="${videoUrl}">
-          <img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" alt="${p.title || "Project"
-                } thumbnail" loading="lazy">
+          <img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" alt="${p.title || "Project"} thumbnail" loading="lazy">
           <div class="play-btn"></div>
         </button>`;
         } else if (p.thumb) {
@@ -149,12 +150,14 @@ document.addEventListener("DOMContentLoaded", async () => {
           <div class="play-btn"></div>
         </button>`;
         } else {
+            // Sin video → hueco visible
             thumbHtml = `
         <div class="thumb is-missing" aria-disabled="true" title="No video provided">
           <span class="missing-label">NO VIDEO</span>
         </div>`;
         }
 
+        // Sin year ni directed_by
         return `
       <article class="card">
         <header class="card-header">
@@ -194,7 +197,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             });
 
-            // Click en thumbnails con vídeo
+            // Click en los thumbnails con video
             document.querySelectorAll(".thumb[data-video]").forEach((btn) => {
                 btn.addEventListener("click", () => {
                     const url = btn.getAttribute("data-video");
@@ -207,10 +210,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (gridVfx) gridVfx.innerHTML = "<p>No se pudieron cargar los proyectos.</p>";
         }
     }
-
     await loadProjects();
 
-    /* ===== MODAL Video (Home + Cards) ===== */
+    /* ===== MODAL Video ===== */
     const modal = document.getElementById("videoModal");
     const media = document.getElementById("modalMedia");
     const closeBtn = modal ? modal.querySelector(".modal-close") : null;
@@ -245,10 +247,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         modal.classList.remove("open");
         unlockScroll();
         modal.setAttribute("aria-hidden", "true");
-        media.innerHTML = ""; // parar reproducción
+        media.innerHTML = "";
     }
 
-    // Abrir desde los dos hero-cards
     document.querySelectorAll(".hero-card").forEach((btn) => {
         btn.addEventListener("click", () => {
             const url = btn.getAttribute("data-video");
@@ -263,16 +264,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    /* ===== Drawer móvil (hamburguesa) ===== */
+    /* ===== Drawer móvil ===== */
     const burgerBtn = document.getElementById("burgerBtn");
     const mobileMenu = document.getElementById("mobileMenu");
     const drawerClose = mobileMenu ? mobileMenu.querySelector(".drawer-close") : null;
     const mobileBackdrop = document.getElementById("mobileBackdrop");
 
-    function isMobileMenuOpen() {
-        return mobileMenu && mobileMenu.classList.contains("open");
-    }
-
+    function isMobileMenuOpen() { return mobileMenu && mobileMenu.classList.contains("open") }
     function openMobileMenu() {
         if (!mobileMenu || !mobileBackdrop || !burgerBtn) return;
         mobileMenu.classList.add("open");
@@ -281,7 +279,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         mobileMenu.setAttribute("aria-hidden", "false");
         lockScroll();
     }
-
     function closeMobileMenu() {
         if (!mobileMenu || !mobileBackdrop || !burgerBtn) return;
         mobileMenu.classList.remove("open");
@@ -295,18 +292,148 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (drawerClose) drawerClose.addEventListener("click", closeMobileMenu);
     if (mobileBackdrop) mobileBackdrop.addEventListener("click", closeMobileMenu);
 
-    // Cerrar al pasar a desktop
     window.addEventListener("resize", () => {
         if (window.innerWidth >= 860 && isMobileMenuOpen()) closeMobileMenu();
     });
 
-    // ESC para cerrar modal o drawer
     document.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
             if (modal && modal.classList.contains("open")) closeModal();
             if (isMobileMenuOpen()) closeMobileMenu();
         }
     });
+
+    /* ========= CV/Breakdown: visor único con 3 botones ========= */
+    let cvSimpleInit = false;
+
+    function initCvSimpleViewerOnce() {
+        if (cvSimpleInit) return;
+        cvSimpleInit = true;
+
+        const MAP = {
+            cv: { title: "Curriculum Vitae", url: "assets/cv_lucas.pdf" },
+            anim: { title: "Breakdown Animation", url: "assets/breakdown_animation.pdf" },
+            vfx: { title: "Breakdown VFX", url: "assets/breakdown_vfx.pdf" }
+        };
+
+        const viewerEl = document.getElementById("cvViewer");
+        const canvas = viewerEl.querySelector("canvas");
+        const prevBtn = document.getElementById("cvPrev");
+        const nextBtn = document.getElementById("cvNext");
+        const pageLbl = document.getElementById("cvPage");
+        const tabs = document.querySelectorAll(".cv-switch .seg-btn");
+
+        const state = { pdf: null, pageNum: 1, pageCount: 1, current: "cv", rendering: false };
+
+        if (window.pdfjsLib) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc =
+                "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
+        }
+
+        function setActiveTab(key) {
+            tabs.forEach(b => {
+                const is = b.dataset.doc === key;
+                b.classList.toggle("is-active", is);
+                b.setAttribute("aria-selected", is ? "true" : "false");
+            });
+        }
+
+        function updateButtons() {
+            pageLbl.textContent = `${state.pageNum} / ${state.pageCount}`;
+            prevBtn.disabled = state.pageNum <= 1;
+            nextBtn.disabled = state.pageNum >= state.pageCount;
+        }
+
+        function renderPage() {
+            if (!state.pdf) return;
+            state.rendering = true;
+            state.pdf.getPage(state.pageNum).then(p => {
+                const viewport = p.getViewport({ scale: 1 });
+                const wrap = viewerEl.querySelector(".cv-canvas-wrap");
+                const cw = wrap.clientWidth || viewerEl.clientWidth || 800;
+                const scale = cw / viewport.width;
+                const vp = p.getViewport({ scale });
+
+                canvas.width = Math.floor(vp.width);
+                canvas.height = Math.floor(vp.height);
+
+                const ctx = canvas.getContext("2d");
+                return p.render({ canvasContext: ctx, viewport: vp }).promise;
+            }).then(() => {
+                state.rendering = false;
+                updateButtons();
+            });
+        }
+
+        function loadDoc(key) {
+            const doc = MAP[key];
+            if (!doc) return;
+            state.current = key;
+            setActiveTab(key);
+
+            if (state.pdf && state.pdf.destroy) {
+                try { state.pdf.destroy(); } catch { }
+            }
+            state.pdf = null;
+            state.pageNum = 1;
+            state.pageCount = 1;
+            updateButtons();
+
+            if (!window.pdfjsLib) {
+                viewerEl.querySelector(".cv-canvas-wrap").innerHTML =
+                    '<div style="padding:16px">No se encontró PDF.js</div>';
+                return;
+            }
+
+            pdfjsLib.getDocument(doc.url).promise.then(pdf => {
+                state.pdf = pdf;
+                state.pageCount = pdf.numPages;
+                state.pageNum = 1;
+                updateButtons();
+                renderPage();
+            }).catch(() => {
+                viewerEl.querySelector(".cv-canvas-wrap").innerHTML =
+                    '<div style="padding:16px">No se pudo cargar el PDF.</div>';
+            });
+        }
+
+        // Eventos
+        tabs.forEach(btn => {
+            btn.addEventListener("click", () => loadDoc(btn.dataset.doc));
+        });
+        prevBtn.addEventListener("click", () => {
+            if (state.pageNum > 1) {
+                state.pageNum--;
+                updateButtons();
+                renderPage();
+            }
+        });
+        nextBtn.addEventListener("click", () => {
+            if (state.pageNum < state.pageCount) {
+                state.pageNum++;
+                updateButtons();
+                renderPage();
+            }
+        });
+        window.addEventListener("resize", debounce(() => {
+            if (!state.rendering && state.pdf) renderPage();
+        }, 150));
+
+        // Arrancar mostrando el CV (cambia a "anim" si lo prefieres)
+        loadDoc("cv");
+    }
+
+    /* ===== debounce utilitario ===== */
+    function debounce(fn, ms) {
+        let t;
+        return (...args) => {
+            clearTimeout(t);
+            t = setTimeout(() => fn.apply(this, args), ms);
+        };
+    }
+
+    // Alias de compatibilidad por si queda alguna llamada antigua
+    window.initCvMultiViewerOnce = initCvSimpleViewerOnce;
 
     // Estado inicial
     setActive("section-home");
