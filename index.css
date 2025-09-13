@@ -1287,3 +1287,31 @@ body {
     border: 0;
     background: #000;
 }
+
+/* ===== Fade de secciones (0.25s) ===== */
+.main-content>section {
+    opacity: 1;
+    transition: opacity .25s ease;
+}
+
+/* Estado temporal mientras se anima */
+.main-content>section.is-appearing,
+.main-content>section.is-hiding {
+    opacity: 0;
+}
+
+/* ===== Transición de secciones secuencial (0.25s) ===== */
+.main-content>section {
+    opacity: 1;
+    transition: opacity .25s ease;
+}
+
+/* Fade OUT (se mantiene visible hasta que acabe la animación) */
+.main-content>section.is-hiding {
+    opacity: 0;
+}
+
+/* Estado inicial del Fade IN (se muestra con opacity:0 y luego sube a 1) */
+.main-content>section.is-showing {
+    opacity: 0;
+}

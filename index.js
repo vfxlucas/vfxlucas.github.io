@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const headerEl = document.querySelector(".site-header");
     let scrollLocks = 0;
     let SBW = 0; // ScrollBar Width (px)
+    let sectionAnimToken = 0;
 
     function calcSBW() {
         SBW = window.innerWidth - document.documentElement.clientWidth;
@@ -40,6 +41,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     function setActive(targetId) {
+        const FADE_MS = 50; // 0.25s
+        const token = ++sectionAnimToken;
+
+        const targetEl = sections[targetId];
+        if (!targetEl) return;
+
+        // Actualiza estado de navegación
         document.querySelectorAll(".nav-link").forEach((a) => {
             const isActive = a.dataset.target === targetId;
             a.classList.toggle("is-active", isActive);
@@ -47,16 +55,54 @@ document.addEventListener("DOMContentLoaded", async () => {
             else a.removeAttribute("aria-current");
         });
 
-        Object.entries(sections).forEach(([id, el]) => {
-            const show = id === targetId;
-            el.classList.toggle("is-hidden", !show);
-            el.setAttribute("aria-hidden", show ? "false" : "true");
-        });
+        const allSections = Object.values(sections).filter(Boolean);
+        const currentEl = allSections.find(el => !el.classList.contains("is-hidden"));
 
-        if (targetId === "section-cv") initCvButtonsOnce();
+        // Si ya estamos en la misma sección, nada que hacer
+        if (currentEl === targetEl) return;
 
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        // Paso 2: mostrar la nueva (fade-in) DESPUÉS de que termine el fade-out
+        const showTarget = () => {
+            if (token !== sectionAnimToken) return; // abort si hubo otro cambio
+            targetEl.classList.remove("is-hidden");
+            targetEl.classList.add("is-showing");
+            targetEl.setAttribute("aria-hidden", "false");
+
+            // Inicializa el viewer de CV si abrimos esa sección
+            if (targetId === "section-cv") {
+                if (typeof initCvSimpleViewerOnce === "function") initCvSimpleViewerOnce();
+                else if (typeof initCvMultiViewerOnce === "function") initCvMultiViewerOnce();
+            }
+
+            // Forzamos reflow y quitamos is-showing para animar a opacity:1
+            requestAnimationFrame(() => {
+                if (token !== sectionAnimToken) return;
+                void targetEl.offsetHeight;
+                targetEl.classList.remove("is-showing");
+            });
+        };
+
+        // Paso 1: ocultar la actual con fade-out; al terminar, la ocultamos con display:none
+        if (currentEl) {
+            currentEl.classList.add("is-hiding");
+            currentEl.setAttribute("aria-hidden", "true");
+
+            setTimeout(() => {
+                if (token !== sectionAnimToken) return; // abort si cambió
+                currentEl.classList.add("is-hidden");
+                currentEl.classList.remove("is-hiding");
+                showTarget(); // ahora sí, mostramos la nueva
+            }, FADE_MS);
+        } else {
+            // No había sección visible (primer carga): solo fade-in de la nueva
+            showTarget();
+        }
+
+        // Scroll al inicio (instantáneo para no interferir la transición)
+        window.scrollTo({ top: 0, behavior: "instant" });
     }
+
+
 
     document.querySelectorAll(".nav-link").forEach((a) => {
         a.addEventListener("click", (e) => {
@@ -123,56 +169,65 @@ document.addEventListener("DOMContentLoaded", async () => {
             getVimeoId(p.vimeo) ||
             getVimeoId(p.video_url);
 
-        const videoUrl = vimeoId
-            ? `https://vimeo.com/${vimeoId}`
-            : ytId
-                ? `https://www.youtube.com/watch?v=${ytId}`
-                : p.video_url || "";
+        // Construcción de videoUrl (prioriza Vimeo si viene en video_url)
+        const rawUrl = (p.video_url || "").trim();
+        let videoUrl = "";
+
+        if (rawUrl && /vimeo\.com/i.test(rawUrl)) {
+            // Mantén exactamente la URL de Vimeo (útil para tokens/hashes privados)
+            videoUrl = rawUrl;
+        } else if (vimeoId) {
+            videoUrl = `https://vimeo.com/${vimeoId}`;
+        } else if (ytId) {
+            videoUrl = `https://www.youtube.com/watch?v=${ytId}`;
+        } else {
+            videoUrl = rawUrl; // puede ser mp4/webm u otra URL o vacío
+        }
 
         // Thumbnail preferencia
         let thumbHtml = "";
         if (ytId) {
             thumbHtml = `
-        <button class="thumb thumb--clean" type="button" data-video="${videoUrl}">
-          <img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" alt="${p.title || "Project"
-                } thumbnail" loading="lazy">
-          <div class="play-btn"></div>
-        </button>`;
+      <button class="thumb thumb--clean" type="button" data-video="${videoUrl}">
+        <img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" alt="${p.title || "Project"} thumbnail" loading="lazy">
+        <div class="play-btn"></div>
+      </button>`;
         } else if (p.thumb) {
             thumbHtml = `
-        <button class="thumb thumb--clean" type="button" data-video="${videoUrl}">
-          <img src="${p.thumb}" alt="${p.title || "Project"} thumbnail" loading="lazy">
-          <div class="play-btn"></div>
-        </button>`;
+      <button class="thumb thumb--clean" type="button" data-video="${videoUrl}">
+        <img src="${p.thumb}" alt="${p.title || "Project"} thumbnail" loading="lazy">
+        <div class="play-btn"></div>
+      </button>`;
         } else if (videoUrl) {
             thumbHtml = `
-        <button class="thumb thumb--clean" type="button" data-video="${videoUrl}">
-          <div class="play-btn"></div>
-        </button>`;
+      <button class="thumb thumb--clean" type="button" data-video="${videoUrl}">
+        <div class="play-btn"></div>
+      </button>`;
         } else {
             // Sin video → hueco visible
             thumbHtml = `
-        <div class="thumb is-missing" aria-disabled="true" title="No video provided">
-          <span class="missing-label">NO VIDEO</span>
-        </div>`;
+      <div class="thumb is-missing" aria-disabled="true" title="No video provided">
+        <span class="missing-label">NO VIDEO</span>
+      </div>`;
         }
 
         // Sin year ni directed_by
         return `
-      <article class="card">
-        <header class="card-header">
-          <h2 class="card-title">${p.title ?? ""}</h2>
-        </header>
-        ${thumbHtml}
-        <ul class="info-list">
-          ${makeInfo("Studio", p.studio)}
-          ${makeInfo("Comp Supervisor", p.comp_supervisor)}
-          ${makeInfo("Comp Lead", p.comp_lead)}
-          ${makeInfo("My role", p.role)}
-          ${makeInfo("Software", p.software)}
-        </ul>
-      </article>`;
+    <article class="card">
+      <header class="card-header">
+        <h2 class="card-title">${p.title ?? ""}</h2>
+      </header>
+      ${thumbHtml}
+      <ul class="info-list">
+        ${makeInfo("Studio", p.studio)}
+        ${makeInfo("Comp Supervisor", p.comp_supervisor)}
+        ${makeInfo("Comp Lead", p.comp_lead)}
+        ${makeInfo("My role", p.role)}
+        ${makeInfo("Software", p.software)}
+      </ul>
+    </article>`;
     }
+
 
     /* ===== CARGA Y RENDER (Animation / VFX) ===== */
     const gridAnim = document.getElementById("gridAnimation");
@@ -220,20 +275,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     function openModalFromUrl(urlOrId) {
         if (!modal || !media) return;
 
-        const vimeoId = getVimeoId(urlOrId);
-        const ytId = getYouTubeId(urlOrId);
         let nodeHtml = "";
 
+        // Archivos de vídeo locales / CDN (mp4/webm/ogg)
         if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(urlOrId)) {
             nodeHtml = `<video src="${urlOrId}" controls autoplay playsinline></video>`;
-        } else if (vimeoId) {
-            const embed = `https://player.vimeo.com/video/${vimeoId}?autoplay=1&muted=0&controls=1&title=0&byline=0&portrait=0&dnt=1&transparent=0`;
+        }
+        // Vimeo: acepta vimeo.com/{id} y player.vimeo.com/video/{id}?...
+        else if (/vimeo\.com/i.test(urlOrId)) {
+            let embed = urlOrId;
+            // Si no es ya el player-embed, conviértelo
+            if (!/player\.vimeo\.com\/video\//i.test(embed)) {
+                const vid = getVimeoId(embed);
+                if (vid) embed = `https://player.vimeo.com/video/${vid}`;
+            }
+            embed += (embed.includes("?") ? "&" : "?") +
+                "autoplay=1&muted=0&controls=1&title=0&byline=0&portrait=0&dnt=1&transparent=0";
             nodeHtml = `<iframe src="${embed}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
-        } else if (ytId) {
-            const embed = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`;
-            nodeHtml = `<iframe src="${embed}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-        } else {
-            nodeHtml = `<iframe src="${urlOrId}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+        }
+        // YouTube
+        else {
+            const ytId = getYouTubeId(urlOrId);
+            if (ytId) {
+                const embed = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`;
+                nodeHtml = `<iframe src="${embed}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+            } else {
+                // Fallback genérico
+                nodeHtml = `<iframe src="${urlOrId}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+            }
         }
 
         media.innerHTML = nodeHtml;
@@ -241,6 +310,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         lockScroll();
         modal.setAttribute("aria-hidden", "false");
     }
+
 
     function closeModal() {
         if (!modal || !media) return;
