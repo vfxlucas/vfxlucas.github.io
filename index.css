@@ -4,35 +4,32 @@
 * {
     box-sizing: border-box;
     margin: 0;
-    padding: 0;
+    padding: 0
 }
 
 html {
-    scrollbar-gutter: stable;
+    scrollbar-gutter: stable
 }
 
 /* Ocultar scrollbars (sigue habiendo scroll) */
 html,
 body {
     -ms-overflow-style: none;
-    /* IE/Edge */
-    scrollbar-width: none;
-    /* Firefox */
+    scrollbar-width: none
 }
 
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {
     width: 0;
     height: 0;
-    background: transparent;
-    /* Chrome/Safari/Opera */
+    background: transparent
 }
 
 :root {
     --bg: #000000;
     --bg-soft: #1a1a1a;
     --fg: #fff;
-    --muted: rgba(182, 182, 182, 0.65);
+    --muted: rgba(182, 182, 182, .65);
     --line: rgba(255, 255, 255, .12);
     --accent: #ffffff;
 
@@ -48,7 +45,7 @@ body::-webkit-scrollbar {
 
 html,
 body {
-    height: 100%;
+    height: 100%
 }
 
 body {
@@ -60,69 +57,56 @@ body {
 }
 
 .no-scroll {
-    overflow: hidden;
+    overflow: hidden
 }
 
 .container {
     max-width: 1720px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 20px
 }
 
 .is-hidden {
-    display: none !important;
+    display: none !important
 }
 
 /* ---- Brand (logo + texto) ---- */
 .brand {
     display: inline-flex;
     align-items: center;
-    /* centra verticalmente el logo */
     gap: 10px;
-    /* espacio entre logo y texto */
     text-decoration: none;
     color: var(--fg);
-    line-height: 1;
-    /* evita espacio extra vertical */
+    line-height: 1
 }
 
-/* El logo ocupa (altura del header - padding visual) y mantiene aspect ratio */
 .brand-logo {
     height: calc(var(--header-h) - 20px);
-    /* 64px - 20px = 44px por defecto */
     width: auto;
-    /* mantiene relación de aspecto */
     display: block;
-    /* elimina espacio por baseline */
-    object-fit: contain;
-    /* por si el PNG tiene margen */
+    object-fit: contain
 }
 
-/* Teléfono: ocultar logo y compactar el brand */
-@media (max-width: 540px) {
+@media (max-width:540px) {
     .brand-logo {
-        display: none;
+        display: none
     }
 
     .brand {
-        gap: 0;
+        gap: 0
     }
 
-    /* quita el hueco que dejaba el logo */
     .brand-text {
         font-size: 1rem;
-        /* ajusta si quieres más pequeño */
-        letter-spacing: .12em;
+        letter-spacing: .12em
     }
 }
 
-/* Texto del brand */
 .brand-text {
     font-weight: 700;
     letter-spacing: .1em;
-    white-space: nowrap;
+    white-space: nowrap
 }
-
 
 /* =================
    Header & Nav Bar
@@ -132,28 +116,28 @@ body {
     inset: 0 0 auto 0;
     height: var(--header-h);
     z-index: 100;
-    background: rgba(25, 25, 25, 0.75);
+    background: rgba(25, 25, 25, .75);
     border-bottom: 1px solid var(--line);
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px)
 }
 
 .header-inner {
     height: var(--header-h);
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: space-between
 }
 
 .brand {
     letter-spacing: .1em;
     font-weight: 700;
     text-decoration: none;
-    color: var(--fg);
+    color: var(--fg)
 }
 
 .site-nav {
     display: flex;
-    gap: 18px;
+    gap: 18px
 }
 
 .nav-link {
@@ -163,15 +147,15 @@ body {
     color: var(--muted);
     text-decoration: none;
     font-weight: 600;
-    letter-spacing: .03em;
+    letter-spacing: .03em
 }
 
 .nav-link:hover {
-    color: var(--fg);
+    color: var(--fg)
 }
 
 .nav-link.is-active {
-    color: var(--fg);
+    color: var(--fg)
 }
 
 .nav-link.is-active::after {
@@ -182,12 +166,10 @@ body {
     bottom: -8px;
     height: 2px;
     background: var(--accent);
-    border-radius: 2px;
+    border-radius: 2px
 }
 
-/* =========================
-   Burger (solo móvil)
-   ========================= */
+/* Burger */
 .burger {
     display: none;
     width: 42px;
@@ -198,7 +180,7 @@ body {
     background: rgba(0, 0, 0, .35);
     border-radius: 12px;
     color: #fff;
-    cursor: pointer;
+    cursor: pointer
 }
 
 .burger-lines {
@@ -206,7 +188,7 @@ body {
     height: 2px;
     background: #fff;
     position: relative;
-    display: block;
+    display: block
 }
 
 .burger-lines::before,
@@ -216,30 +198,28 @@ body {
     left: 0;
     width: 20px;
     height: 2px;
-    background: #fff;
+    background: #fff
 }
 
 .burger-lines::before {
-    top: -6px;
+    top: -6px
 }
 
 .burger-lines::after {
-    top: 6px;
+    top: 6px
 }
 
-@media (max-width: 859px) {
+@media (max-width:859px) {
     .site-nav {
-        display: none;
+        display: none
     }
 
     .burger {
-        display: inline-flex;
+        display: inline-flex
     }
 }
 
-/* =====================
-   Drawer móvil (derecha)
-   ===================== */
+/* Drawer móvil */
 .mobile-drawer {
     position: fixed;
     top: 0;
@@ -253,11 +233,11 @@ body {
     transition: transform .25s ease;
     z-index: 120;
     padding: 18px;
-    display: none;
+    display: none
 }
 
 .mobile-drawer.open {
-    transform: translateX(0);
+    transform: translateX(0)
 }
 
 .drawer-close {
@@ -271,7 +251,7 @@ body {
     background: rgba(0, 0, 0, .45);
     color: #fff;
     font-size: 22px;
-    cursor: pointer;
+    cursor: pointer
 }
 
 .drawer-list {
@@ -279,22 +259,22 @@ body {
     margin-top: 56px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 10px
 }
 
-.drawer-list .drawer-link {
+.drawer-link {
     display: block;
     padding: 12px 10px;
     border-radius: 10px;
     text-decoration: none;
     color: var(--fg);
     background: transparent;
-    border: 1px solid transparent;
+    border: 1px solid transparent
 }
 
-.drawer-list .drawer-link:hover {
+.drawer-link:hover {
     background: rgba(255, 255, 255, .06);
-    border-color: var(--line);
+    border-color: var(--line)
 }
 
 .mobile-backdrop {
@@ -306,21 +286,21 @@ body {
     pointer-events: none;
     transition: opacity .2s ease;
     z-index: 110;
-    display: none;
+    display: none
 }
 
 .mobile-backdrop.open {
     opacity: 1;
-    pointer-events: auto;
+    pointer-events: auto
 }
 
-@media (max-width: 859px) {
+@media (max-width:859px) {
     .mobile-drawer {
-        display: block;
+        display: block
     }
 
     .mobile-backdrop {
-        display: block;
+        display: block
     }
 }
 
@@ -332,8 +312,8 @@ body {
     inset: var(--header-h) 0 0 0;
     z-index: 0;
     pointer-events: none;
-    --pattern-strong: rgba(255, 255, 255, 0.01);
-    --pattern-fine: rgba(255, 255, 255, 0.02);
+    --pattern-strong: rgba(255, 255, 255, .01);
+    --pattern-fine: rgba(255, 255, 255, .02);
     background-color: #080808;
     background-image:
         linear-gradient(var(--pattern-strong) 2px, transparent 2px),
@@ -350,12 +330,12 @@ body {
     inset: 0;
     pointer-events: none;
     background: linear-gradient(to right,
-            rgba(0, 0, 0, 0.28) 0%,
-            rgba(0, 0, 0, 0.12) 3%,
-            rgba(0, 0, 0, 0.00) 10%,
-            rgba(0, 0, 0, 0.00) 90%,
-            rgba(0, 0, 0, 0.12) 97%,
-            rgba(0, 0, 0, 0.28) 100%);
+            rgba(0, 0, 0, .28) 0%,
+            rgba(0, 0, 0, .12) 3%,
+            rgba(0, 0, 0, 0) 10%,
+            rgba(0, 0, 0, 0) 90%,
+            rgba(0, 0, 0, .12) 97%,
+            rgba(0, 0, 0, .28) 100%)
 }
 
 /* ==========
@@ -364,31 +344,29 @@ body {
 .main-content {
     padding-top: var(--main-pt);
     position: relative;
-    z-index: 1;
+    z-index: 1
 }
 
-/* === Centrado vertical del HOME respetando el header fijo === */
+/* Home centrado */
 #section-home {
     min-height: calc(100vh - var(--header-h) - var(--main-pt));
     min-height: calc(100svh - var(--header-h) - var(--main-pt));
     display: grid;
-    place-items: center;
+    place-items: center
 }
 
 #section-home .hero {
-    margin: 0;
+    margin: 0
 }
 
-/* ===========================
-   HERO (Home: 2 vídeos grandes)
-   =========================== */
+/* HERO (dos vídeos) */
 .hero {
     display: grid;
     justify-content: center;
     align-items: center;
     margin-block: clamp(3rem, 6vw, 8rem);
     gap: clamp(16px, 2vw, 28px);
-    grid-template-columns: repeat(2, minmax(520px, 1fr));
+    grid-template-columns: repeat(2, minmax(520px, 1fr))
 }
 
 .hero-card {
@@ -404,10 +382,9 @@ body {
     aspect-ratio: 16/9;
     width: 100%;
     max-width: 900px;
-    justify-self: center;
+    justify-self: center
 }
 
-/* Estado inicial: thumbnail difuminado */
 .hero-card img {
     width: 100%;
     height: 100%;
@@ -415,18 +392,16 @@ body {
     display: block;
     filter: blur(2px) saturate(.9) brightness(.85);
     transform: scale(1.01);
-    transition: filter .35s ease, opacity .35s ease, transform .35s ease;
+    transition: filter .35s ease, opacity .35s ease, transform .35s ease
 }
 
-/* Oscurecido suave */
 .hero-dim {
     position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, .28);
-    transition: opacity .35s ease;
+    transition: opacity .35s ease
 }
 
-/* Texto grande centrado (visible por defecto) */
 .hero-label {
     position: absolute;
     inset: 0;
@@ -446,10 +421,9 @@ body {
     text-shadow: 0 2px 12px rgba(0, 0, 0, .45);
     opacity: 1;
     transform: scale(1);
-    transition: opacity .25s ease, transform .25s ease, background .25s ease;
+    transition: opacity .25s ease, transform .25s ease, background .25s ease
 }
 
-/* Play oculto por defecto; aparece en hover */
 .hero-play {
     position: absolute;
     inset: 0;
@@ -457,7 +431,7 @@ body {
     place-items: center;
     opacity: 0;
     transform: scale(.92);
-    transition: opacity .2s ease, transform .2s ease;
+    transition: opacity .2s ease, transform .2s ease
 }
 
 .hero-play::before {
@@ -466,7 +440,7 @@ body {
     height: 84px;
     border-radius: 50%;
     background: rgba(255, 255, 255, .94);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, .45);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .45)
 }
 
 .hero-play::after {
@@ -475,70 +449,68 @@ body {
     margin-left: 6px;
     border-style: solid;
     border-width: 16px 0 16px 26px;
-    border-color: transparent transparent transparent #111;
+    border-color: transparent transparent transparent #111
 }
 
-/* Hover / focus: mostramos PLAY y ocultamos texto */
 .hero-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .45)
 }
 
 .hero-card:hover img {
     filter: none;
-    transform: none;
+    transform: none
 }
 
 .hero-card:hover .hero-dim {
-    opacity: .15;
+    opacity: .15
 }
 
 .hero-card:hover .hero-label {
     opacity: 0;
-    transform: scale(.98);
+    transform: scale(.98)
 }
 
 .hero-card:hover .hero-play {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1)
 }
 
 .hero-card:focus-visible .hero-label {
     opacity: 0;
-    transform: scale(.98);
+    transform: scale(.98)
 }
 
 .hero-card:focus-visible .hero-play {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1)
 }
 
-/* Apilar en pantallas pequeñas */
-@media (max-width: 1200px) {
+@media (max-width:1200px) {
     .hero {
         grid-template-columns: 1fr;
         max-width: min(1100px, 100%);
-        margin-inline: auto;
+        margin-inline: auto
     }
 
     .hero-card {
-        max-width: 1100px;
+        max-width: 1100px
     }
 }
 
-@media (max-width: 540px) {
+@media (max-width:540px) {
     .hero-card {
         max-width: 100%;
-        border-radius: 14px;
+        border-radius: 14px
     }
 
     .hero-play::before {
         width: 70px;
-        height: 70px;
+        height: 70px
     }
 
     .hero-play::after {
-        border-width: 12px 0 12px 20px;
+        border-width: 12px 0 12px 20px
     }
 }
 
@@ -548,35 +520,35 @@ body {
 .section-title {
     font-size: 2rem;
     font-weight: 600;
-    margin-bottom: 20px;
+    margin-bottom: 20px
 }
 
 .grid {
     display: grid;
     gap: 20px;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr))
 }
 
-/* ===== Card de proyecto ===== */
+/* Card de proyecto */
 .card {
-    background: rgba(25, 25, 25, 0.75);
+    background: rgba(25, 25, 25, .75);
     border: 1px solid var(--line);
     border-radius: 16px;
     overflow: hidden;
     transition: box-shadow .2s ease;
-    padding-bottom: var(--card-pad-y);
+    padding-bottom: var(--card-pad-y)
 }
 
 .card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, .6);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .6)
 }
 
-/* Título: máx 2 líneas con elipsis; centrado si 1 línea */
+/* Título (máx 2 líneas, centrado) */
 .card-header {
     padding: var(--title-pad);
     min-height: calc(var(--title-fs) * var(--title-lh) * var(--title-lines) + (var(--title-pad) * 2));
     display: grid;
-    align-content: center;
+    align-content: center
 }
 
 .card-title {
@@ -589,7 +561,7 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     line-clamp: 2;
-    max-height: calc(var(--title-fs) * var(--title-lh) * var(--title-lines));
+    max-height: calc(var(--title-fs) * var(--title-lh) * var(--title-lines))
 }
 
 /* Miniatura 16:9 y play overlay */
@@ -598,17 +570,16 @@ body {
     aspect-ratio: 16/9;
     background: #000;
     display: block;
-    overflow: hidden;
+    overflow: hidden
 }
 
 .thumb img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
+    display: block
 }
 
-/* Play sobre el thumbnail (no bloquea el click) */
 .thumb .play-btn {
     position: absolute;
     inset: 0;
@@ -616,7 +587,7 @@ body {
     place-items: center;
     z-index: 1;
     pointer-events: none;
-    background: transparent;
+    background: transparent
 }
 
 .thumb .play-btn::before {
@@ -625,7 +596,7 @@ body {
     height: 60px;
     border-radius: 50%;
     background: rgba(255, 255, 255, .9);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, .45);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .45)
 }
 
 .thumb .play-btn::after {
@@ -634,28 +605,26 @@ body {
     margin-left: 4px;
     border-style: solid;
     border-width: 10px 0 10px 18px;
-    border-color: transparent transparent transparent #111;
+    border-color: transparent transparent transparent #111
 }
 
 .info-list {
     list-style: none;
     padding: 16px;
     padding-bottom: var(--card-pad-y);
-    font-size: .9rem;
+    font-size: .9rem
 }
 
 .info-list li {
-    margin-bottom: 6px;
+    margin-bottom: 6px
 }
 
-/* === Placeholder cuando NO hay vídeo === */
+/* Placeholder sin vídeo */
 .thumb.is-missing {
-    background:
-        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.06) 0 10px, transparent 10px 20px),
-        #0e0e0e;
-    border: 1px dashed rgba(255, 255, 255, 0.22);
+    background: repeating-linear-gradient(45deg, rgba(255, 255, 255, .06) 0 10px, transparent 10px 20px), #0e0e0e;
+    border: 1px dashed rgba(255, 255, 255, .22);
     display: grid;
-    place-items: center;
+    place-items: center
 }
 
 .missing-label {
@@ -665,47 +634,55 @@ body {
     background: rgba(0, 0, 0, .45);
     padding: 6px 10px;
     border-radius: 8px;
-    text-transform: uppercase;
+    text-transform: uppercase
 }
 
-/* === Estilo para valores "CHANGE" visibles === */
+/* Estilo para valores "CHANGE" visibles */
 .info-list li.is-missing {
     color: rgba(255, 255, 255, .55);
-    font-style: italic;
+    font-style: italic
 }
 
 .info-list li.is-missing strong {
     color: rgba(255, 255, 255, .8);
-    font-style: normal;
+    font-style: normal
 }
 
-/* Quitar borde de miniaturas con vídeo (Animation / VFX) */
+/* Quitar borde de miniaturas con vídeo */
 .thumb[data-video],
 .thumb.thumb--clean {
     border: none !important;
     outline: none !important;
     box-shadow: none !important;
-    background: #000;
+    background: #000
 }
 
 .thumb[data-video] img,
 .thumb.thumb--clean img {
     border: 0;
     outline: 0;
-    box-shadow: none;
+    box-shadow: none
 }
 
 /* ===== ABOUT ===== */
 .about {
     display: grid;
-    grid-template-columns: minmax(280px, 0.9fr) 1.1fr;
+    grid-template-columns: minmax(280px, .95fr) 1.05fr;
     gap: clamp(16px, 2vw, 28px);
-    margin-bottom: clamp(28px, 4vw, 48px);
+    margin-bottom: clamp(28px, 4vw, 48px)
 }
 
-@media (max-width: 1000px) {
+/* NUEVO: columnas con gap vertical entre sus cards */
+.about-left,
+.about-right {
+    display: grid;
+    gap: clamp(16px, 1.8vw, 24px);
+    /* <- espaciado vertical real entre cards */
+}
+
+@media (max-width:1000px) {
     .about {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr
     }
 }
 
@@ -714,18 +691,18 @@ body {
     border: 1px solid var(--line);
     border-radius: 16px;
     padding: clamp(16px, 2vw, 22px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .3)
 }
 
 .about-intro {
     font-size: clamp(1rem, 1.15vw, 1.06rem);
-    color: var(--fg);
+    color: var(--fg)
 }
 
 .about-subtitle {
     font-size: 1.05rem;
     font-weight: 700;
-    margin-bottom: 10px;
+    margin-bottom: 10px
 }
 
 .about-list {
@@ -733,11 +710,11 @@ body {
     display: grid;
     gap: 8px;
     font-size: .98rem;
-    color: var(--muted);
+    color: var(--muted)
 }
 
 .about-list li strong {
-    color: var(--fg);
+    color: var(--fg)
 }
 
 .about-pills {
@@ -745,7 +722,7 @@ body {
     margin-top: 12px;
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 8px
 }
 
 .pill {
@@ -754,17 +731,35 @@ body {
     border: 1px solid var(--line);
     color: var(--fg);
     border-radius: 999px;
-    background: rgba(255, 255, 255, .04);
+    background: rgba(255, 255, 255, .04)
 }
 
 #section-about a {
     color: #fff;
     text-decoration: underline;
-    text-underline-offset: 3px;
+    text-underline-offset: 3px
 }
 
 #section-about a:hover {
-    text-decoration-thickness: 2px;
+    text-decoration-thickness: 2px
+}
+
+/* NUEVO: Foto de perfil dentro de la primera about-card */
+.about-photo {
+    width: 128px;
+    height: 128px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .18);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
+    margin-bottom: 14px
+}
+
+.about-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block
 }
 
 /* ================
@@ -776,21 +771,20 @@ body {
     z-index: 140;
     display: none;
     align-items: center;
-    justify-content: center;
+    justify-content: center
 }
 
 .modal.open {
-    display: flex;
+    display: flex
 }
 
 .modal-backdrop {
     position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, .6);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px)
 }
 
-/* Caja del modal (ratio 16:9 y límites) */
 .modal-dialog {
     position: relative;
     width: min(96vw, 1920px);
@@ -801,18 +795,16 @@ body {
     overflow: hidden;
     box-shadow: 0 20px 60px rgba(0, 0, 0, .6);
     z-index: 1;
-    animation: modalIn .18s ease-out;
+    animation: modalIn .18s ease-out
 }
 
-/* La zona media ocupa todo el modal */
 .modal-media {
     position: absolute;
     inset: 0;
     width: 100%;
-    height: 100%;
+    height: 100%
 }
 
-/* Iframe / video al 100% y escalado */
 .modal-media iframe,
 .modal-media video {
     position: absolute;
@@ -822,7 +814,7 @@ body {
     display: block;
     border: 0;
     object-fit: contain;
-    background: #000;
+    background: #000
 }
 
 .modal-close {
@@ -840,32 +832,29 @@ body {
     cursor: pointer;
     display: grid;
     place-items: center;
-    z-index: 2;
+    z-index: 2
 }
 
 @keyframes modalIn {
     from {
         transform: scale(0);
-        opacity: .7;
+        opacity: .7
     }
 
     to {
         transform: scale(1);
-        opacity: 1;
+        opacity: 1
     }
 }
 
 /* Centrar títulos en los cards de proyectos (Animation y VFX) */
 #section-animation .card-header,
 #section-vfx .card-header {
-    text-align: center;
-    /* centra horizontalmente */
+    text-align: center
 }
 
 #section-animation .card-title,
 #section-vfx .card-title {
     text-align: center;
-    /* centra el texto */
-    margin-inline: auto;
-    /* por si el navegador aplica ancho intrínseco */
+    margin-inline: auto
 }
