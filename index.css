@@ -11,6 +11,23 @@ html {
     scrollbar-gutter: stable;
 }
 
+/* Ocultar scrollbars (sigue habiendo scroll) */
+html,
+body {
+    -ms-overflow-style: none;
+    /* IE/Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    background: transparent;
+    /* Chrome/Safari/Opera */
+}
+
 :root {
     --bg: #000000;
     --bg-soft: #1a1a1a;
@@ -55,6 +72,57 @@ body {
 .is-hidden {
     display: none !important;
 }
+
+/* ---- Brand (logo + texto) ---- */
+.brand {
+    display: inline-flex;
+    align-items: center;
+    /* centra verticalmente el logo */
+    gap: 10px;
+    /* espacio entre logo y texto */
+    text-decoration: none;
+    color: var(--fg);
+    line-height: 1;
+    /* evita espacio extra vertical */
+}
+
+/* El logo ocupa (altura del header - padding visual) y mantiene aspect ratio */
+.brand-logo {
+    height: calc(var(--header-h) - 20px);
+    /* 64px - 20px = 44px por defecto */
+    width: auto;
+    /* mantiene relación de aspecto */
+    display: block;
+    /* elimina espacio por baseline */
+    object-fit: contain;
+    /* por si el PNG tiene margen */
+}
+
+/* Teléfono: ocultar logo y compactar el brand */
+@media (max-width: 540px) {
+    .brand-logo {
+        display: none;
+    }
+
+    .brand {
+        gap: 0;
+    }
+
+    /* quita el hueco que dejaba el logo */
+    .brand-text {
+        font-size: 1rem;
+        /* ajusta si quieres más pequeño */
+        letter-spacing: .12em;
+    }
+}
+
+/* Texto del brand */
+.brand-text {
+    font-weight: 700;
+    letter-spacing: .1em;
+    white-space: nowrap;
+}
+
 
 /* =================
    Header & Nav Bar
@@ -282,8 +350,12 @@ body {
     inset: 0;
     pointer-events: none;
     background: linear-gradient(to right,
-            rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.12) 3%, rgba(0, 0, 0, 0.00) 10%,
-            rgba(0, 0, 0, 0.00) 90%, rgba(0, 0, 0, 0.12) 97%, rgba(0, 0, 0, 0.28) 100%);
+            rgba(0, 0, 0, 0.28) 0%,
+            rgba(0, 0, 0, 0.12) 3%,
+            rgba(0, 0, 0, 0.00) 10%,
+            rgba(0, 0, 0, 0.00) 90%,
+            rgba(0, 0, 0, 0.12) 97%,
+            rgba(0, 0, 0, 0.28) 100%);
 }
 
 /* ==========
@@ -605,6 +677,22 @@ body {
 .info-list li.is-missing strong {
     color: rgba(255, 255, 255, .8);
     font-style: normal;
+}
+
+/* Quitar borde de miniaturas con vídeo (Animation / VFX) */
+.thumb[data-video],
+.thumb.thumb--clean {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: #000;
+}
+
+.thumb[data-video] img,
+.thumb.thumb--clean img {
+    border: 0;
+    outline: 0;
+    box-shadow: none;
 }
 
 /* ===== ABOUT ===== */
