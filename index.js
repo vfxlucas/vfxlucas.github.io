@@ -101,8 +101,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function makeInfo(label, value) {
-        if (!value || value === "CHANGE") return "";
-        return `<li><strong>${label}:</strong> ${value}</li>`;
+        const v = (value ?? "").toString();
+        if (v.trim() === "") return ""; // si viene vacío, no pintamos la fila
+        const isChange = v.trim().toUpperCase() === "CHANGE";
+        return `<li class="${isChange ? 'is-missing' : ''}"><strong>${label}:</strong> ${v}</li>`;
     }
 
     function makeCard(p) {
@@ -110,6 +112,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             getYouTubeId(p.youtube_id) ||
             getYouTubeId(p.youtube_url) ||
             getYouTubeId(p.youtube);
+
         const vimeoId =
             getVimeoId(p.vimeo_id) ||
             getVimeoId(p.vimeo_url) ||
@@ -122,7 +125,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 ? `https://www.youtube.com/watch?v=${ytId}`
                 : (p.video_url || "");
 
-        // Thumbnail preferencia: YouTube → p.thumb → placeholder
+        // Thumbnail preferencia:
+        // 1) YouTube → miniatura oficial
+        // 2) p.thumb → imagen custom
+        // 3) Tiene videoUrl pero sin thumb → botón con play
+        // 4) No hay video → placeholder visible "NO VIDEO"
         let thumbHtml = "";
         if (ytId) {
             thumbHtml = `
@@ -136,11 +143,17 @@ document.addEventListener("DOMContentLoaded", async () => {
           <img src="${p.thumb}" alt="${p.title || "Project"} thumbnail" loading="lazy">
           <div class="play-btn"></div>
         </button>`;
-        } else {
+        } else if (videoUrl) {
             thumbHtml = `
         <button class="thumb" type="button" data-video="${videoUrl}">
           <div class="play-btn"></div>
         </button>`;
+        } else {
+            // Sin vídeo → hueco visible
+            thumbHtml = `
+        <div class="thumb is-missing" aria-disabled="true" title="No video provided">
+          <span class="missing-label">NO VIDEO</span>
+        </div>`;
         }
 
         return `
@@ -184,7 +197,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             });
 
-            // Clic en los thumbnails de los cards
+            // Clic SOLO en thumbs con data-video (los placeholders no tienen)
             document.querySelectorAll(".thumb[data-video]").forEach((btn) => {
                 btn.addEventListener("click", () => {
                     const url = btn.getAttribute("data-video");
@@ -208,22 +221,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     function openModalFromUrl(urlOrId) {
         if (!modal || !media) return;
 
+        const vimeoId = getVimeoId(urlOrId);
+        const ytId = getYouTubeId(urlOrId);
         let nodeHtml = "";
 
-        // MP4/WEBM locales o de CDN
+        // MP4/WEBM/OGG locales o CDN
         if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(urlOrId)) {
             nodeHtml = `<video src="${urlOrId}" controls autoplay playsinline></video>`;
         }
-        // Vimeo
-        else if (getVimeoId(urlOrId)) {
-            const vid = getVimeoId(urlOrId);
-            const embed = `https://player.vimeo.com/video/${vid}?autoplay=1&title=0&byline=0&portrait=0&dnt=1`;
+        // Vimeo embebido
+        else if (vimeoId) {
+            const embed = `https://player.vimeo.com/video/${vimeoId}?autoplay=1&muted=0&controls=1&title=0&byline=0&portrait=0&dnt=1&transparent=0`;
             nodeHtml = `<iframe src="${embed}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
         }
         // YouTube
-        else if (getYouTubeId(urlOrId)) {
-            const yt = getYouTubeId(urlOrId);
-            const embed = `https://www.youtube.com/embed/${yt}?autoplay=1&rel=0&modestbranding=1`;
+        else if (ytId) {
+            const embed = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`;
             nodeHtml = `<iframe src="${embed}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
         }
         // Fallback

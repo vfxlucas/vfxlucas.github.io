@@ -576,6 +576,37 @@ body {
     margin-bottom: 6px;
 }
 
+/* === Placeholder cuando NO hay vídeo === */
+.thumb.is-missing {
+    background:
+        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.06) 0 10px, transparent 10px 20px),
+        #0e0e0e;
+    border: 1px dashed rgba(255, 255, 255, 0.22);
+    display: grid;
+    place-items: center;
+}
+
+.missing-label {
+    font-size: .9rem;
+    letter-spacing: .08em;
+    color: rgba(255, 255, 255, .55);
+    background: rgba(0, 0, 0, .45);
+    padding: 6px 10px;
+    border-radius: 8px;
+    text-transform: uppercase;
+}
+
+/* === Estilo para valores "CHANGE" visibles === */
+.info-list li.is-missing {
+    color: rgba(255, 255, 255, .55);
+    font-style: italic;
+}
+
+.info-list li.is-missing strong {
+    color: rgba(255, 255, 255, .8);
+    font-style: normal;
+}
+
 /* ===== ABOUT ===== */
 .about {
     display: grid;
@@ -671,6 +702,7 @@ body {
     backdrop-filter: blur(10px);
 }
 
+/* Caja del modal (ratio 16:9 y límites) */
 .modal-dialog {
     position: relative;
     width: min(96vw, 1920px);
@@ -684,8 +716,19 @@ body {
     animation: modalIn .18s ease-out;
 }
 
+/* La zona media ocupa todo el modal */
+.modal-media {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Iframe / video al 100% y escalado */
 .modal-media iframe,
 .modal-media video {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     display: block;

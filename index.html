@@ -1,153 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lucas Ramos – Portfolio</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lucas Ramos – Portfolio</title>
 
-  <link rel="stylesheet" href="index.css"/>
-  <script src="index.js" defer></script>
+    <link rel="stylesheet" href="index.css" />
+    <script src="index.js" defer></script>
 </head>
+
 <body>
-  <!-- HEADER -->
-  <header class="site-header">
-    <div class="header-inner container">
-      <a href="#" class="brand" id="brandLink">LUCAS RAMOS</a>
+    <!-- HEADER -->
+    <header class="site-header">
+        <div class="header-inner container">
+            <a href="#" class="brand" id="brandLink">LUCAS RAMOS</a>
 
-      <!-- Nav desktop -->
-      <nav class="site-nav" aria-label="Primary">
-        <a href="#home" class="nav-link is-active" data-target="section-home" aria-current="page">Home</a>
-        <a href="#animation" class="nav-link" data-target="section-animation">Animation</a>
-        <a href="#vfx" class="nav-link" data-target="section-vfx">VFX</a>
-        <!-- <a href="#about" class="nav-link" data-target="section-about">About</a> -->
-      </nav>
+            <!-- Nav desktop -->
+            <nav class="site-nav" aria-label="Primary">
+                <a href="#home" class="nav-link is-active" data-target="section-home" aria-current="page">Home</a>
+                <a href="#animation" class="nav-link" data-target="section-animation">Animation</a>
+                <a href="#vfx" class="nav-link" data-target="section-vfx">VFX</a>
+                <!-- <a href="#about" class="nav-link" data-target="section-about">About</a> -->
+            </nav>
 
-      <!-- Botón hamburguesa (solo móvil) -->
-      <button class="burger" id="burgerBtn" aria-label="Open menu" aria-controls="mobileMenu" aria-expanded="false">
-        <span class="burger-lines"></span>
-      </button>
-    </div>
-  </header>
-
-  <!-- Fondo global (debajo del header) -->
-  <div class="page-bg" aria-hidden="true"></div>
-
-  <!-- Drawer móvil -->
-  <nav id="mobileMenu" class="mobile-drawer" aria-hidden="true" aria-label="Mobile">
-    <button class="drawer-close" type="button" aria-label="Close menu">&times;</button>
-    <ul class="drawer-list">
-      <li><a href="#home" class="nav-link drawer-link" data-target="section-home">Home</a></li>
-      <li><a href="#animation" class="nav-link drawer-link" data-target="section-animation">Animation</a></li>
-      <li><a href="#vfx" class="nav-link drawer-link" data-target="section-vfx">VFX</a></li>
-      <!-- <li><a href="#about" class="nav-link drawer-link" data-target="section-about">About</a></li> -->
-    </ul>
-  </nav>
-  <div id="mobileBackdrop" class="mobile-backdrop" data-close="true" aria-hidden="true"></div>
-
-  <!-- CONTENIDO -->
-  <main class="container main-content">
-    <!-- HOME: dos vídeos con texto grande centrado -->
-    <section id="section-home">
-      <div class="hero">
-        <!-- Cambia data-video a tu URL de Vimeo pública o con “people with the link” embebible -->
-        <button class="hero-card" type="button" data-video="https://vimeo.com/123456789" aria-label="Play VFX reel">
-          <img src="assets/vfx.png" alt="VFX Reel thumbnail"/>
-          <span class="hero-dim" aria-hidden="true"></span>
-          <span class="hero-label">VFX</span>
-          <span class="hero-play"></span>
-        </button>
-
-        <button class="hero-card" type="button" data-video="https://vimeo.com/987654321" aria-label="Play Animation reel">
-          <img src="assets/anim.png" alt="Animation Reel thumbnail"/>
-          <span class="hero-dim" aria-hidden="true"></span>
-          <span class="hero-label">ANIMATION</span>
-          <span class="hero-play"></span>
-        </button>
-      </div>
-    </section>
-
-    <!-- ANIMATION -->
-    <section id="section-animation" class="is-hidden" aria-hidden="true">
-      <h1 class="section-title">Animation</h1>
-      <div class="grid" id="gridAnimation"></div>
-    </section>
-
-    <!-- VFX -->
-    <section id="section-vfx" class="is-hidden" aria-hidden="true">
-      <h1 class="section-title">VFX</h1>
-      <div class="grid" id="gridVfx"></div>
-    </section>
-
-    <!-- ABOUT -->
-    <section id="section-about" class="is-hidden" aria-hidden="true">
-      <h1 class="section-title">About me</h1>
-
-      <div class="about">
-        <div class="about-left">
-          <div class="about-card">
-            <p class="about-intro">
-              Soy <strong>Lucas Ramos</strong>, <strong>VFX Compositor</strong> (nacido en Francia, con base en España).
-              He trabajado en <strong>live-action</strong> y <strong>animación</strong>. Busco el equilibrio entre la
-              <strong>exigencia técnica</strong> y la <strong>intención artística</strong> en equipos colaborativos.
-            </p>
-            <ul class="about-pills">
-              <li class="pill">Nuke</li>
-              <li class="pill">2D/3D Compositing</li>
-              <li class="pill">Live-action & Animation</li>
-              <li class="pill">Roto / Prep</li>
-            </ul>
-          </div>
-
-          <div class="about-card">
-            <h3 class="about-subtitle">Education</h3>
-            <ul class="about-list">
-              <li><strong>Master in Digital Compositing for VFX</strong> — U-TAD (Madrid), 2019–2020</li>
-              <li><strong>3D Animation, Games & Interactive Environments</strong> — Florida Universitaria (Valencia), 2017–2019</li>
-            </ul>
-          </div>
-
-          <div class="about-card">
-            <h3 class="about-subtitle">Contact</h3>
-            <ul class="about-list">
-              <li>Email: <a href="mailto:lucasramosvfx@gmail.com">lucasramosvfx@gmail.com</a></li>
-              <li>Base: Spain (born in France)</li>
-            </ul>
-          </div>
+            <!-- Botón hamburguesa (solo móvil) -->
+            <button class="burger" id="burgerBtn" aria-label="Open menu" aria-controls="mobileMenu"
+                aria-expanded="false">
+                <span class="burger-lines"></span>
+            </button>
         </div>
+    </header>
 
-        <div class="about-right">
-          <div class="about-card">
-            <h3 class="about-subtitle">Selected credits</h3>
-            <ul class="about-list">
-              <li><strong>Guardians of the Galaxy Vol. 3</strong> — Digital Compositor @ RISE FX (2023)</li>
-              <li><strong>The Hunger Games: The Ballad of Songbirds & Snakes</strong> — Digital Compositor @ RISE FX (2023)</li>
-              <li><strong>The Gryphon (Der Greif)</strong> — Digital Compositor @ RISE FX (2023)</li>
-              <li><strong>The Lazarus Project S2</strong> — Digital Compositor</li>
-              <li><strong>The Quinta's Ghost</strong> — 3D Compositor @ Illusorium Studios (2024–2025)</li>
-              <li><strong>Dungeon Fighter Mobile</strong> — Digital Compositor @ Illusorium Studios (2024–2025)</li>
-              <li><strong>Secret Levels (Amazon Prime Video)</strong> — Digital Compositor @ Illusorium Studios (2024–2025)</li>
-              <li><strong>Sky: Children of the Light</strong> — Digital Compositor @ Illusorium Studios (2024–2025)</li>
-              <li><strong>SEE S03</strong> — Digital Compositor</li>
-              <li><strong>Élite S05</strong> — Digital Compositor</li>
-              <li><strong>Modelo 77</strong> — Digital Compositor</li>
-              <li><strong>Rainbow</strong> — Digital Compositor</li>
-              <li><strong>Las de la Última Fila</strong> — Digital Compositor</li>
-              <li><strong>Amor de Madre</strong> — Digital Compositor</li>
-              <li><strong>Un Asunto Privado</strong> — Digital Compositor</li>
-            </ul>
-          </div>
+    <!-- Fondo global (debajo del header) -->
+    <div class="page-bg" aria-hidden="true"></div>
+
+    <!-- Drawer móvil -->
+    <nav id="mobileMenu" class="mobile-drawer" aria-hidden="true" aria-label="Mobile">
+        <button class="drawer-close" type="button" aria-label="Close menu">&times;</button>
+        <ul class="drawer-list">
+            <li><a href="#home" class="nav-link drawer-link" data-target="section-home">Home</a></li>
+            <li><a href="#animation" class="nav-link drawer-link" data-target="section-animation">Animation</a></li>
+            <li><a href="#vfx" class="nav-link drawer-link" data-target="section-vfx">VFX</a></li>
+            <!-- <li><a href="#about" class="nav-link drawer-link" data-target="section-about">About</a></li> -->
+        </ul>
+    </nav>
+    <div id="mobileBackdrop" class="mobile-backdrop" data-close="true" aria-hidden="true"></div>
+
+    <!-- CONTENIDO -->
+    <main class="container main-content">
+        <!-- HOME: dos vídeos con texto grande centrado -->
+        <section id="section-home">
+            <div class="hero">
+                <!-- VFX reel -->
+                <button class="hero-card" type="button" data-video="https://vimeo.com/977104943"
+                    aria-label="Play VFX reel">
+                    <img src="assets/vfx.png" alt="VFX Reel thumbnail" />
+                    <span class="hero-dim" aria-hidden="true"></span>
+                    <span class="hero-label">VFX</span>
+                    <span class="hero-play"></span>
+                </button>
+
+                <!-- Animation reel -->
+                <button class="hero-card" type="button" data-video="https://vimeo.com/1053509205"
+                    aria-label="Play Animation reel">
+                    <img src="assets/anim.png" alt="Animation Reel thumbnail" />
+                    <span class="hero-dim" aria-hidden="true"></span>
+                    <span class="hero-label">ANIMATION</span>
+                    <span class="hero-play"></span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ANIMATION -->
+        <section id="section-animation" class="is-hidden" aria-hidden="true">
+            <h1 class="section-title">Animation</h1>
+            <div class="grid" id="gridAnimation"></div>
+        </section>
+
+        <!-- VFX -->
+        <section id="section-vfx" class="is-hidden" aria-hidden="true">
+            <h1 class="section-title">VFX</h1>
+            <div class="grid" id="gridVfx"></div>
+        </section>
+
+        <!-- ABOUT -->
+        <section id="section-about" class="is-hidden" aria-hidden="true">
+            <h1 class="section-title">About me</h1>
+
+            <div class="about">
+                <div class="about-left">
+                    <div class="about-card">
+                        <p class="about-intro">
+                            Soy <strong>Lucas Ramos</strong>, <strong>VFX Compositor</strong> (nacido en Francia, con
+                            base en España).
+                            He trabajado en <strong>live-action</strong> y <strong>animación</strong>. Busco el
+                            equilibrio entre la
+                            <strong>exigencia técnica</strong> y la <strong>intención artística</strong> en equipos
+                            colaborativos.
+                        </p>
+                        <ul class="about-pills">
+                            <li class="pill">Nuke</li>
+                            <li class="pill">2D/3D Compositing</li>
+                            <li class="pill">Live-action & Animation</li>
+                            <li class="pill">Roto / Prep</li>
+                        </ul>
+                    </div>
+
+                    <div class="about-card">
+                        <h3 class="about-subtitle">Education</h3>
+                        <ul class="about-list">
+                            <li><strong>Master in Digital Compositing for VFX</strong> — U-TAD (Madrid), 2019–2020</li>
+                            <li><strong>3D Animation, Games & Interactive Environments</strong> — Florida Universitaria
+                                (Valencia), 2017–2019</li>
+                        </ul>
+                    </div>
+
+                    <div class="about-card">
+                        <h3 class="about-subtitle">Contact</h3>
+                        <ul class="about-list">
+                            <li>Email: <a href="mailto:lucasramosvfx@gmail.com">lucasramosvfx@gmail.com</a></li>
+                            <li>Base: Spain (born in France)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="about-right">
+                    <div class="about-card">
+                        <h3 class="about-subtitle">Selected credits</h3>
+                        <ul class="about-list">
+                            <li><strong>Guardians of the Galaxy Vol. 3</strong> — Digital Compositor @ RISE FX (2023)
+                            </li>
+                            <li><strong>The Hunger Games: The Ballad of Songbirds & Snakes</strong> — Digital Compositor
+                                @ RISE FX (2023)</li>
+                            <li><strong>The Gryphon (Der Greif)</strong> — Digital Compositor @ RISE FX (2023)</li>
+                            <li><strong>The Lazarus Project S2</strong> — Digital Compositor</li>
+                            <li><strong>The Quinta's Ghost</strong> — 3D Compositor @ Illusorium Studios (2024–2025)
+                            </li>
+                            <li><strong>Dungeon Fighter Mobile</strong> — Digital Compositor @ Illusorium Studios
+                                (2024–2025)</li>
+                            <li><strong>Secret Levels (Amazon Prime Video)</strong> — Digital Compositor @ Illusorium
+                                Studios (2024–2025)</li>
+                            <li><strong>Sky: Children of the Light</strong> — Digital Compositor @ Illusorium Studios
+                                (2024–2025)</li>
+                            <li><strong>SEE S03</strong> — Digital Compositor</li>
+                            <li><strong>Élite S05</strong> — Digital Compositor</li>
+                            <li><strong>Modelo 77</strong> — Digital Compositor</li>
+                            <li><strong>Rainbow</strong> — Digital Compositor</li>
+                            <li><strong>Las de la Última Fila</strong> — Digital Compositor</li>
+                            <li><strong>Amor de Madre</strong> — Digital Compositor</li>
+                            <li><strong>Un Asunto Privado</strong> — Digital Compositor</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL / LIGHTBOX -->
+    <div id="videoModal" class="modal" aria-hidden="true">
+        <div class="modal-backdrop" data-close="true"></div>
+        <div class="modal-dialog" role="dialog" aria-modal="true" aria-label="Video player">
+            <button class="modal-close" type="button" aria-label="Close">&times;</button>
+            <div class="modal-media" id="modalMedia"></div>
         </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- MODAL / LIGHTBOX -->
-  <div id="videoModal" class="modal" aria-hidden="true">
-    <div class="modal-backdrop" data-close="true"></div>
-    <div class="modal-dialog" role="dialog" aria-modal="true" aria-label="Video player">
-      <button class="modal-close" type="button" aria-label="Close">&times;</button>
-      <div class="modal-media" id="modalMedia"></div>
     </div>
-  </div>
 </body>
+
 </html>
