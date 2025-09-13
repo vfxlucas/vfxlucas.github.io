@@ -1,17 +1,5 @@
 [
     {
-        "title": "The Gryphon (Der Greif)",
-        "studio": "RISE FX",
-        "year": "2023",
-        "directed_by": "Sebastian Marka, Max Zähle",
-        "comp_supervisor": "Erik Schneider",
-        "comp_lead": "CHANGE",
-        "role": "Digital Compositor",
-        "software": "Nuke",
-        "youtube_url": "https://www.youtube.com/watch?v=cCQ-nBvYo0E",
-        "type": "vfx"
-    },
-    {
         "title": "Guardians of the Galaxy Vol. 3",
         "studio": "RISE FX",
         "year": "2023",
@@ -21,6 +9,18 @@
         "role": "Digital Compositor",
         "software": "Nuke",
         "youtube_url": "https://www.youtube.com/watch?v=u3V5KDHRQvk",
+        "type": "vfx"
+    },
+    {
+        "title": "The Gryphon (Der Greif)",
+        "studio": "RISE FX",
+        "year": "2023",
+        "directed_by": "Sebastian Marka, Max Zähle",
+        "comp_supervisor": "Erik Schneider",
+        "comp_lead": "CHANGE",
+        "role": "Digital Compositor",
+        "software": "Nuke",
+        "youtube_url": "https://www.youtube.com/watch?v=cCQ-nBvYo0E",
         "type": "vfx"
     },
     {
