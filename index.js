@@ -53,8 +53,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             el.setAttribute("aria-hidden", show ? "false" : "true");
         });
 
-        // Inicializador correcto del visor CV simple (3 botones)
-        if (targetId === "section-cv") initCvSimpleViewerOnce();
+        if (targetId === "section-cv") initCvButtonsOnce();
 
         window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -135,7 +134,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (ytId) {
             thumbHtml = `
         <button class="thumb thumb--clean" type="button" data-video="${videoUrl}">
-          <img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" alt="${p.title || "Project"} thumbnail" loading="lazy">
+          <img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" alt="${p.title || "Project"
+                } thumbnail" loading="lazy">
           <div class="play-btn"></div>
         </button>`;
         } else if (p.thumb) {
@@ -270,7 +270,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const drawerClose = mobileMenu ? mobileMenu.querySelector(".drawer-close") : null;
     const mobileBackdrop = document.getElementById("mobileBackdrop");
 
-    function isMobileMenuOpen() { return mobileMenu && mobileMenu.classList.contains("open") }
+    function isMobileMenuOpen() {
+        return mobileMenu && mobileMenu.classList.contains("open");
+    }
     function openMobileMenu() {
         if (!mobileMenu || !mobileBackdrop || !burgerBtn) return;
         mobileMenu.classList.add("open");
@@ -299,131 +301,83 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
             if (modal && modal.classList.contains("open")) closeModal();
+            if (pdfModal && pdfModal.classList.contains("open")) closePdfOverlay();
             if (isMobileMenuOpen()) closeMobileMenu();
         }
     });
 
-    /* ========= CV/Breakdown: visor único con 3 botones ========= */
-    let cvSimpleInit = false;
+    /* ========= PDF overlay (desktop) / descarga (móvil) ========= */
+    const pdfModal = document.getElementById("pdfModal");
+    const pdfMedia = document.getElementById("pdfMedia");
+    const pdfDialog = pdfModal ? pdfModal.querySelector(".modal-dialog") : null;
+    const pdfClose = pdfModal ? pdfModal.querySelector(".modal-close") : null;
 
-    function initCvSimpleViewerOnce() {
-        if (cvSimpleInit) return;
-        cvSimpleInit = true;
+    function openPdfOverlay(url, title) {
+        if (!pdfModal || !pdfMedia) return;
+        if (pdfDialog) pdfDialog.classList.add("pdf-wide");
+        // Visor nativo del navegador
+        pdfMedia.innerHTML = `<iframe src="${url}" title="${title || "PDF"}" loading="lazy"></iframe>`;
+        pdfModal.classList.add("open");
+        lockScroll();
+        pdfModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closePdfOverlay() {
+        if (!pdfModal || !pdfMedia) return;
+        pdfModal.classList.remove("open");
+        unlockScroll();
+        pdfModal.setAttribute("aria-hidden", "true");
+        pdfMedia.innerHTML = "";
+        if (pdfDialog) pdfDialog.classList.remove("pdf-wide");
+    }
+
+    if (pdfClose) pdfClose.addEventListener("click", closePdfOverlay);
+    if (pdfModal) {
+        pdfModal.addEventListener("click", (e) => {
+            if (e.target instanceof Element && e.target.hasAttribute("data-close")) closePdfOverlay();
+        });
+    }
+
+    function triggerDownload(url, filename) {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename || url.split("/").pop() || "document.pdf";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    }
+
+    let cvButtonsInit = false;
+    function initCvButtonsOnce() {
+        if (cvButtonsInit) return;
+        cvButtonsInit = true;
 
         const MAP = {
             cv: { title: "Curriculum Vitae", url: "assets/cv_lucas.pdf" },
             anim: { title: "Breakdown Animation", url: "assets/breakdown_animation.pdf" },
-            vfx: { title: "Breakdown VFX", url: "assets/breakdown_vfx.pdf" }
+            vfx: { title: "Breakdown VFX", url: "assets/breakdown_vfx.pdf" },
         };
 
-        const viewerEl = document.getElementById("cvViewer");
-        const canvas = viewerEl.querySelector("canvas");
-        const prevBtn = document.getElementById("cvPrev");
-        const nextBtn = document.getElementById("cvNext");
-        const pageLbl = document.getElementById("cvPage");
-        const tabs = document.querySelectorAll(".cv-switch .seg-btn");
+        const pills = document.querySelectorAll(".cv-pill");
+        pills.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const key = btn.dataset.doc;
+                const doc = MAP[key];
+                if (!doc) return;
 
-        const state = { pdf: null, pageNum: 1, pageCount: 1, current: "cv", rendering: false };
-
-        if (window.pdfjsLib) {
-            pdfjsLib.GlobalWorkerOptions.workerSrc =
-                "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
-        }
-
-        function setActiveTab(key) {
-            tabs.forEach(b => {
-                const is = b.dataset.doc === key;
-                b.classList.toggle("is-active", is);
-                b.setAttribute("aria-selected", is ? "true" : "false");
+                // móvil: descarga; desktop/tablet: overlay
+                const isSmall = window.matchMedia("(max-width: 540px)").matches;
+                if (isSmall) {
+                    const safeName = doc.title.replace(/\s+/g, "_") + ".pdf";
+                    triggerDownload(doc.url, safeName);
+                } else {
+                    openPdfOverlay(doc.url, doc.title);
+                }
             });
-        }
-
-        function updateButtons() {
-            pageLbl.textContent = `${state.pageNum} / ${state.pageCount}`;
-            prevBtn.disabled = state.pageNum <= 1;
-            nextBtn.disabled = state.pageNum >= state.pageCount;
-        }
-
-        function renderPage() {
-            if (!state.pdf) return;
-            state.rendering = true;
-            state.pdf.getPage(state.pageNum).then(p => {
-                const viewport = p.getViewport({ scale: 1 });
-                const wrap = viewerEl.querySelector(".cv-canvas-wrap");
-                const cw = wrap.clientWidth || viewerEl.clientWidth || 800;
-                const scale = cw / viewport.width;
-                const vp = p.getViewport({ scale });
-
-                canvas.width = Math.floor(vp.width);
-                canvas.height = Math.floor(vp.height);
-
-                const ctx = canvas.getContext("2d");
-                return p.render({ canvasContext: ctx, viewport: vp }).promise;
-            }).then(() => {
-                state.rendering = false;
-                updateButtons();
-            });
-        }
-
-        function loadDoc(key) {
-            const doc = MAP[key];
-            if (!doc) return;
-            state.current = key;
-            setActiveTab(key);
-
-            if (state.pdf && state.pdf.destroy) {
-                try { state.pdf.destroy(); } catch { }
-            }
-            state.pdf = null;
-            state.pageNum = 1;
-            state.pageCount = 1;
-            updateButtons();
-
-            if (!window.pdfjsLib) {
-                viewerEl.querySelector(".cv-canvas-wrap").innerHTML =
-                    '<div style="padding:16px">No se encontró PDF.js</div>';
-                return;
-            }
-
-            pdfjsLib.getDocument(doc.url).promise.then(pdf => {
-                state.pdf = pdf;
-                state.pageCount = pdf.numPages;
-                state.pageNum = 1;
-                updateButtons();
-                renderPage();
-            }).catch(() => {
-                viewerEl.querySelector(".cv-canvas-wrap").innerHTML =
-                    '<div style="padding:16px">No se pudo cargar el PDF.</div>';
-            });
-        }
-
-        // Eventos
-        tabs.forEach(btn => {
-            btn.addEventListener("click", () => loadDoc(btn.dataset.doc));
         });
-        prevBtn.addEventListener("click", () => {
-            if (state.pageNum > 1) {
-                state.pageNum--;
-                updateButtons();
-                renderPage();
-            }
-        });
-        nextBtn.addEventListener("click", () => {
-            if (state.pageNum < state.pageCount) {
-                state.pageNum++;
-                updateButtons();
-                renderPage();
-            }
-        });
-        window.addEventListener("resize", debounce(() => {
-            if (!state.rendering && state.pdf) renderPage();
-        }, 150));
-
-        // Arrancar mostrando el CV (cambia a "anim" si lo prefieres)
-        loadDoc("cv");
     }
 
-    /* ===== debounce utilitario ===== */
+    /* Utilidad: debounce */
     function debounce(fn, ms) {
         let t;
         return (...args) => {
@@ -431,9 +385,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             t = setTimeout(() => fn.apply(this, args), ms);
         };
     }
-
-    // Alias de compatibilidad por si queda alguna llamada antigua
-    window.initCvMultiViewerOnce = initCvSimpleViewerOnce;
 
     // Estado inicial
     setActive("section-home");

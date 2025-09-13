@@ -139,10 +139,10 @@
 
                     <div class="studio-logos">
                         <!-- Sustituye por tus rutas reales si ya tienes SVG/PNG -->
-                        <img src="assets/logos/risefx.svg" alt="RISE FX">
-                        <img src="assets/logos/elranchito.svg" alt="El Ranchito">
-                        <img src="assets/logos/vinefx.svg" alt="Vine FX">
-                        <img src="assets/logos/illusorium.svg" alt="Illusorium Studios">
+                        <img src="assets/logo_twin_pines.png" alt="RISE FX">
+                        <img src="assets/logo_twin_pines.png" alt="El Ranchito">
+                        <img src="assets/logo_twin_pines.png" alt="Vine FX">
+                        <img src="assets/logo_twin_pines.png" alt="Illusorium Studios">
                     </div>
                 </article>
             </div>
@@ -152,30 +152,24 @@
         <section id="section-cv" class="is-hidden" aria-hidden="true">
             <h1 class="section-title">CV/Breakdown</h1>
 
-            <!-- Botonera (3 opciones) -->
-            <div class="cv-switch" role="tablist" aria-label="Documentos CV/Breakdown">
-                <button class="seg-btn is-active" data-doc="cv" role="tab" aria-selected="true">Curriculum
-                    Vitae</button>
-                <button class="seg-btn" data-doc="anim" role="tab" aria-selected="false">Breakdown Animation</button>
-                <button class="seg-btn" data-doc="vfx" role="tab" aria-selected="false">Breakdown VFX</button>
+            <div class="cv-chooser">
+                <button class="cv-pill" data-doc="cv" aria-label="Open Curriculum Vitae"
+                    style="--bg:url('assets/icon_pdf.png')">
+                    <span class="cv-pill-label">CV</span>
+                </button>
+
+                <button class="cv-pill" data-doc="anim" aria-label="Open Breakdown Animation"
+                    style="--bg:url('assets/icon_pdf.png')">
+                    <span class="cv-pill-label">BREAKDOWN<br>ANIMATION</span>
+                </button>
+
+                <button class="cv-pill" data-doc="vfx" aria-label="Open Breakdown VFX"
+                    style="--bg:url('assets/icon_pdf.png')">
+                    <span class="cv-pill-label">BREAKDOWN<br>VFX</span>
+                </button>
             </div>
-
-            <!-- Visor grande estilo “hero card” -->
-            <article class="cv-hero">
-                <div class="cv-hero-inner" id="cvViewer">
-                    <div class="cv-canvas-wrap">
-                        <canvas></canvas>
-                    </div>
-
-                    <!-- Controles flotantes -->
-                    <div class="cv-hero-controls" aria-label="Controles de página">
-                        <button id="cvPrev" class="btn-ghost" type="button" aria-label="Página anterior">‹</button>
-                        <span id="cvPage" class="cv-hero-page">1 / 1</span>
-                        <button id="cvNext" class="btn-ghost" type="button" aria-label="Página siguiente">›</button>
-                    </div>
-                </div>
-            </article>
         </section>
+
 
     </main>
 
@@ -185,6 +179,24 @@
         <div class="modal-dialog" role="dialog" aria-modal="true" aria-label="Video player">
             <button class="modal-close" type="button" aria-label="Close">&times;</button>
             <div class="modal-media" id="modalMedia"></div>
+        </div>
+    </div>
+
+    <!-- MODAL PDF -->
+    <div id="pdfModal" class="modal" aria-hidden="true">
+        <div class="modal-backdrop" data-close="true"></div>
+        <div class="modal-dialog" role="dialog" aria-modal="true" aria-label="PDF viewer">
+            <button class="modal-close" type="button" aria-label="Close">&times;</button>
+            <div class="modal-media pdf-media" id="pdfMedia">
+                <div class="cv-canvas-wrap">
+                    <canvas id="pdfCanvas"></canvas>
+                </div>
+                <div class="cv-controls">
+                    <button class="btn" id="pdfPrev">◀ Prev</button>
+                    <span class="cv-page-indicator" id="pdfPage">1 / 1</span>
+                    <button class="btn" id="pdfNext">Next ▶</button>
+                </div>
+            </div>
         </div>
     </div>
 </body>

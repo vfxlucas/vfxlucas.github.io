@@ -1119,3 +1119,171 @@ body {
     display: block;
     filter: none
 }
+
+/* ===== CV chooser: botones al tamaño real del icono y centrados ===== */
+.cv-chooser {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(3, max-content);
+    /* cada botón mide lo que mide su icono */
+    justify-content: center;
+    /* centra en horizontal */
+    justify-items: center;
+    /* centra cada ítem en su celda */
+    align-items: center;
+    /* alinea verticalmente los ítems */
+}
+
+/* 1 columna en pantallas estrechas */
+@media (max-width: 900px) {
+    .cv-chooser {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Botón rectangular tipo "icon_pdf", recorta al borde y añade overlay */
+.cv-pill {
+    position: relative;
+    display: inline-grid;
+    /* deja que el pseudo-elemento defina el tamaño */
+    place-items: center;
+    overflow: hidden;
+    /* recorte a las esquinas redondeadas */
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: #000;
+    padding: 0;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .2s ease;
+}
+
+/* CLAVE: el botón toma el tamaño intrínseco del icono */
+.cv-pill::before {
+    content: var(--bg);
+    /* usa --bg:url('...') que ya pones inline */
+    display: block;
+    /* el propio icono define ancho/alto del botón */
+}
+
+/* Velo oscuro suave (como en las reels) */
+.cv-pill::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, .28);
+    transition: opacity .25s ease;
+}
+
+.cv-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+}
+
+.cv-pill:hover::after {
+    opacity: .15;
+}
+
+/* Texto centrado en blanco encima del icono */
+.cv-pill-label {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-weight: 900;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    font-size: clamp(.85rem, 1.8vw, 1.1rem);
+    text-shadow: 0 2px 12px rgba(0, 0, 0, .45);
+    pointer-events: none;
+}
+
+
+/* ===== PDF modal: usar misma caja que video, pero con layout canvas + controles ===== */
+.modal-media.pdf-media {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    /* canvas arriba, controles abajo */
+}
+
+.modal-media.pdf-media .cv-canvas-wrap {
+    position: relative;
+    overflow: hidden;
+    /* sin scroll interno */
+}
+
+.modal-media.pdf-media canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* ===== CV chooser: layout teléfono sin scroll ===== */
+@media (max-width: 540px) {
+
+    /* La sección reparte el alto: título (auto) + chooser (1fr) */
+    #section-cv {
+        min-height: calc(100svh - var(--header-h) - var(--main-pt));
+        display: grid;
+        grid-template-rows: auto 1fr;
+    }
+
+    #section-cv .section-title {
+        margin-bottom: 8px;
+        /* compacta el título */
+        line-height: 1.2;
+    }
+
+    /* El chooser ocupa todo el alto restante con 3 filas iguales */
+    .cv-chooser {
+        height: 100%;
+        display: grid;
+        grid-template-columns: 1fr;
+        /* 1 columna */
+        grid-template-rows: repeat(3, 1fr);
+        gap: 10px;
+        align-content: stretch;
+        justify-items: stretch;
+    }
+
+    /* Cada botón llena su fila y escala el icono sin deformar */
+    .cv-pill {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        overflow: hidden;
+        background-image: var(--bg);
+        /* usa el icono que ya pasas con --bg:url(...) */
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+        /* mantiene relación de aspecto del icono */
+    }
+
+    /* Anulamos el pseudo-elemento de desktop para que no fuerce tamaño */
+    .cv-pill::before {
+        content: none;
+    }
+
+    /* Overlay y texto centrado (ya lo tienes) — ajuste de tamaño en móvil */
+    .cv-pill-label {
+        font-size: clamp(.9rem, 3.4vw, 1.15rem);
+    }
+}
+
+/* PDF modal: ancho/alto grandes y sin ratio 16:9 */
+#pdfModal .modal-dialog.pdf-wide {
+    aspect-ratio: auto;
+    /* anula 16:9 del modal base */
+    width: min(96vw, 1280px);
+    height: min(92vh, 92vh);
+}
+
+#pdfModal .pdf-media iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #000;
+}
