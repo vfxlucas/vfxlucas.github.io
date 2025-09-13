@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    /* ===== NAV: mostrar/ocultar secciones ===== */
+    /* ===== NAV: mostrar/ocultar secciones (con fade out → in) ===== */
     const sections = {
         "section-home": document.getElementById("section-home"),
         "section-animation": document.getElementById("section-animation"),
@@ -41,13 +41,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     function setActive(targetId) {
-        const FADE_MS = 50; // 0.25s
+        const FADE_MS = 100; // 0.25s
         const token = ++sectionAnimToken;
 
         const targetEl = sections[targetId];
         if (!targetEl) return;
 
-        // Actualiza estado de navegación
+        // Estado de navegación (active)
         document.querySelectorAll(".nav-link").forEach((a) => {
             const isActive = a.dataset.target === targetId;
             a.classList.toggle("is-active", isActive);
@@ -58,23 +58,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         const allSections = Object.values(sections).filter(Boolean);
         const currentEl = allSections.find(el => !el.classList.contains("is-hidden"));
 
-        // Si ya estamos en la misma sección, nada que hacer
         if (currentEl === targetEl) return;
 
-        // Paso 2: mostrar la nueva (fade-in) DESPUÉS de que termine el fade-out
         const showTarget = () => {
-            if (token !== sectionAnimToken) return; // abort si hubo otro cambio
+            if (token !== sectionAnimToken) return; // Abort si hubo cambio rápido
             targetEl.classList.remove("is-hidden");
             targetEl.classList.add("is-showing");
             targetEl.setAttribute("aria-hidden", "false");
 
-            // Inicializa el viewer de CV si abrimos esa sección
-            if (targetId === "section-cv") {
-                if (typeof initCvSimpleViewerOnce === "function") initCvSimpleViewerOnce();
-                else if (typeof initCvMultiViewerOnce === "function") initCvMultiViewerOnce();
-            }
+            // Inicializa los botones del CV (solo una vez)
+            if (targetId === "section-cv") initCvButtonsOnce();
 
-            // Forzamos reflow y quitamos is-showing para animar a opacity:1
+            // Forzar reflow y hacer fade-in
             requestAnimationFrame(() => {
                 if (token !== sectionAnimToken) return;
                 void targetEl.offsetHeight;
@@ -82,28 +77,25 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         };
 
-        // Paso 1: ocultar la actual con fade-out; al terminar, la ocultamos con display:none
         if (currentEl) {
             currentEl.classList.add("is-hiding");
             currentEl.setAttribute("aria-hidden", "true");
 
             setTimeout(() => {
-                if (token !== sectionAnimToken) return; // abort si cambió
+                if (token !== sectionAnimToken) return;
                 currentEl.classList.add("is-hidden");
                 currentEl.classList.remove("is-hiding");
-                showTarget(); // ahora sí, mostramos la nueva
+                showTarget();
             }, FADE_MS);
         } else {
-            // No había sección visible (primer carga): solo fade-in de la nueva
             showTarget();
         }
 
-        // Scroll al inicio (instantáneo para no interferir la transición)
-        window.scrollTo({ top: 0, behavior: "instant" });
+        // Subir arriba sin animación de scroll para no pelear con el fade
+        window.scrollTo({ top: 0, behavior: "auto" });
     }
 
-
-
+    // Clicks en navegación
     document.querySelectorAll(".nav-link").forEach((a) => {
         a.addEventListener("click", (e) => {
             if (a.closest(".mobile-drawer")) closeMobileMenu();
@@ -169,22 +161,20 @@ document.addEventListener("DOMContentLoaded", async () => {
             getVimeoId(p.vimeo) ||
             getVimeoId(p.video_url);
 
-        // Construcción de videoUrl (prioriza Vimeo si viene en video_url)
         const rawUrl = (p.video_url || "").trim();
         let videoUrl = "";
 
         if (rawUrl && /vimeo\.com/i.test(rawUrl)) {
-            // Mantén exactamente la URL de Vimeo (útil para tokens/hashes privados)
-            videoUrl = rawUrl;
+            videoUrl = rawUrl; // respeta la URL exacta
         } else if (vimeoId) {
             videoUrl = `https://vimeo.com/${vimeoId}`;
         } else if (ytId) {
             videoUrl = `https://www.youtube.com/watch?v=${ytId}`;
         } else {
-            videoUrl = rawUrl; // puede ser mp4/webm u otra URL o vacío
+            videoUrl = rawUrl;
         }
 
-        // Thumbnail preferencia
+        // Thumbnail
         let thumbHtml = "";
         if (ytId) {
             thumbHtml = `
@@ -199,19 +189,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="play-btn"></div>
       </button>`;
         } else if (videoUrl) {
+            // Si es Vimeo y no hay thumb, marcamos para cargar miniatura oEmbed
+            const vimeoMark = /vimeo\.com/i.test(videoUrl) ? ` data-vimeo="${vimeoId || videoUrl}"` : "";
             thumbHtml = `
-      <button class="thumb thumb--clean" type="button" data-video="${videoUrl}">
+      <button class="thumb thumb--clean" type="button" data-video="${videoUrl}"${vimeoMark}>
         <div class="play-btn"></div>
       </button>`;
         } else {
-            // Sin video → hueco visible
             thumbHtml = `
       <div class="thumb is-missing" aria-disabled="true" title="No video provided">
         <span class="missing-label">NO VIDEO</span>
       </div>`;
         }
 
-        // Sin year ni directed_by
         return `
     <article class="card">
       <header class="card-header">
@@ -228,6 +218,42 @@ document.addEventListener("DOMContentLoaded", async () => {
     </article>`;
     }
 
+    async function fetchVimeoThumb(vimeoUrlOrId) {
+        let url = (vimeoUrlOrId || "").toString();
+        if (!/vimeo\.com/i.test(url)) url = `https://vimeo.com/${url}`;
+        const oembed = `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`;
+
+        try {
+            const res = await fetch(oembed, { cache: "no-store" });
+            if (!res.ok) throw new Error(res.statusText);
+            const data = await res.json();
+            return data.thumbnail_url || null;
+        } catch (e) {
+            console.warn("Vimeo oEmbed thumb failed:", e);
+            return null;
+        }
+    }
+
+    function injectThumbIntoButton(btn, thumbUrl, alt) {
+        if (!btn || !thumbUrl) return;
+        btn.innerHTML = `
+        <img src="${thumbUrl}" alt="${alt || "Project thumbnail"}" loading="lazy">
+        <div class="play-btn"></div>
+    `;
+    }
+
+    async function loadVimeoThumbsAfterRender() {
+        const vimeoBtns = document.querySelectorAll('.thumb[data-vimeo]:not(.has-thumb)');
+        await Promise.all(Array.from(vimeoBtns).map(async (btn) => {
+            const src = btn.getAttribute('data-vimeo');
+            const title = btn.closest('.card')?.querySelector('.card-title')?.textContent || "Project";
+            const thumb = await fetchVimeoThumb(src);
+            if (thumb) {
+                injectThumbIntoButton(btn, thumb, `${title} thumbnail`);
+                btn.classList.add('has-thumb');
+            }
+        }));
+    }
 
     /* ===== CARGA Y RENDER (Animation / VFX) ===== */
     const gridAnim = document.getElementById("gridAnimation");
@@ -252,6 +278,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             });
 
+            // Cargar miniaturas de Vimeo de forma asíncrona
+            await loadVimeoThumbsAfterRender();
+
             // Click en los thumbnails con video
             document.querySelectorAll(".thumb[data-video]").forEach((btn) => {
                 btn.addEventListener("click", () => {
@@ -265,9 +294,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (gridVfx) gridVfx.innerHTML = "<p>No se pudieron cargar los proyectos.</p>";
         }
     }
+
     await loadProjects();
 
-    /* ===== MODAL Video ===== */
+    /* ===== MODAL Video (reels) ===== */
     const modal = document.getElementById("videoModal");
     const media = document.getElementById("modalMedia");
     const closeBtn = modal ? modal.querySelector(".modal-close") : null;
@@ -277,14 +307,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         let nodeHtml = "";
 
-        // Archivos de vídeo locales / CDN (mp4/webm/ogg)
         if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(urlOrId)) {
             nodeHtml = `<video src="${urlOrId}" controls autoplay playsinline></video>`;
-        }
-        // Vimeo: acepta vimeo.com/{id} y player.vimeo.com/video/{id}?...
-        else if (/vimeo\.com/i.test(urlOrId)) {
+        } else if (/vimeo\.com/i.test(urlOrId)) {
             let embed = urlOrId;
-            // Si no es ya el player-embed, conviértelo
             if (!/player\.vimeo\.com\/video\//i.test(embed)) {
                 const vid = getVimeoId(embed);
                 if (vid) embed = `https://player.vimeo.com/video/${vid}`;
@@ -292,15 +318,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             embed += (embed.includes("?") ? "&" : "?") +
                 "autoplay=1&muted=0&controls=1&title=0&byline=0&portrait=0&dnt=1&transparent=0";
             nodeHtml = `<iframe src="${embed}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
-        }
-        // YouTube
-        else {
+        } else {
             const ytId = getYouTubeId(urlOrId);
             if (ytId) {
                 const embed = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`;
                 nodeHtml = `<iframe src="${embed}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
             } else {
-                // Fallback genérico
                 nodeHtml = `<iframe src="${urlOrId}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
             }
         }
@@ -310,7 +333,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         lockScroll();
         modal.setAttribute("aria-hidden", "false");
     }
-
 
     function closeModal() {
         if (!modal || !media) return;
@@ -385,7 +407,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     function openPdfOverlay(url, title) {
         if (!pdfModal || !pdfMedia) return;
         if (pdfDialog) pdfDialog.classList.add("pdf-wide");
-        // Visor nativo del navegador
+        // Visor nativo del navegador (con controles del propio navegador)
         pdfMedia.innerHTML = `<iframe src="${url}" title="${title || "PDF"}" loading="lazy"></iframe>`;
         pdfModal.classList.add("open");
         lockScroll();
@@ -401,10 +423,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (pdfDialog) pdfDialog.classList.remove("pdf-wide");
     }
 
-    if (pdfClose) pdfClose.addEventListener("click", closePdfOverlay);
+    // Botón cerrar (por encima del iframe)
+    if (pdfClose) {
+        pdfClose.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            closePdfOverlay();
+        });
+    }
+
+    // Cerrar clicando el backdrop o la X (delegado)
     if (pdfModal) {
         pdfModal.addEventListener("click", (e) => {
-            if (e.target instanceof Element && e.target.hasAttribute("data-close")) closePdfOverlay();
+            const el = e.target;
+            if (!(el instanceof Element)) return;
+            if (el.hasAttribute("data-close") || el.closest(".modal-close")) {
+                closePdfOverlay();
+            }
         });
     }
 
@@ -417,6 +452,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         a.remove();
     }
 
+    // Inicializador de los 3 botones CV/Animation/VFX
     let cvButtonsInit = false;
     function initCvButtonsOnce() {
         if (cvButtonsInit) return;
@@ -447,7 +483,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    /* Utilidad: debounce */
+    /* ===== Utilidad debounce ===== */
     function debounce(fn, ms) {
         let t;
         return (...args) => {

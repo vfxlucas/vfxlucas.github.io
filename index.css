@@ -779,24 +779,56 @@ body {
 .studio-logos {
     margin-top: clamp(14px, 2vw, 22px);
     display: grid;
-    grid-template-columns: repeat(4, minmax(80px, 1fr));
+    grid-template-columns: repeat(4, minmax(120px, 1fr));
     gap: 16px;
-    align-items: center;
+    align-items: stretch;
+    /* que todas las “cards” midan lo mismo en la fila */
 }
 
-.studio-logos img {
-    width: 100%;
-    max-height: 48px;
-    object-fit: contain;
-    filter: invert(1) contrast(1.1) brightness(1.1);
-    opacity: .9
-}
-
-@media (max-width:700px) {
+/* Responsive: reduce columnas en pantallas más estrechas */
+@media (max-width: 1100px) {
     .studio-logos {
-        grid-template-columns: repeat(2, 1fr)
+        grid-template-columns: repeat(3, minmax(110px, 1fr));
     }
 }
+
+@media (max-width: 700px) {
+    .studio-logos {
+        grid-template-columns: repeat(2, minmax(110px, 1fr));
+    }
+}
+
+.studio-logo {
+    display: flex;
+    padding: 12px 10px;
+}
+
+.studio-logo:hover,
+.studio-logo:focus-visible {
+    border-color: rgba(255, 255, 255, .22);
+    transform: translateY(-1px);
+}
+
+.studio-logo img {
+    width: 100%;
+    max-width: 180px;
+    /* límite para que no “revienten” el card */
+    max-height: 64px;
+    /* respeta tu altura máxima */
+    object-fit: contain;
+    filter: saturate(0) brightness(.9);
+    /* look en B/N de base */
+    transition: filter .2s ease, transform .2s ease;
+    display: block;
+}
+
+.studio-logo:hover img,
+.studio-logo:focus-visible img {
+    filter: none;
+    /* vuelve a color en hover/focus */
+    transform: scale(1.02);
+}
+
 
 /* Enlaces claros dentro de tarjeta blanca */
 .card-light a {
