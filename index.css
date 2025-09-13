@@ -4,7 +4,7 @@
 * {
     box-sizing: border-box;
     margin: 0;
-    padding: 0
+
 }
 
 html {
@@ -528,7 +528,9 @@ body {
     border-radius: 16px;
     overflow: hidden;
     transition: box-shadow .2s ease;
-    padding-bottom: var(--card-pad-y)
+    padding-bottom: var(--card-pad-y);
+    margin-right: 6px;
+    font-size: 14px;
 }
 
 .card:hover {
@@ -555,20 +557,28 @@ body {
     max-height: calc(var(--title-fs) * var(--title-lh) * var(--title-lines))
 }
 
-/* Thumbs 16:9 */
+/* Thumbs 16:9 – que SIEMPRE llenen el card, también siendo <button> */
 .thumb {
     position: relative;
-    aspect-ratio: 16/9;
-    background: #000;
     display: block;
-    overflow: hidden
+    width: 100%;
+    /* quita métricas de button por defecto */
+    padding: 0;
+    border: 0;
+    background: #000;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
 }
 
 .thumb img {
+    position: absolute;
+    /* clave: que el img se adapte al contenedor */
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block
+    /* recorta si la miniatura no es 16:9 */
+    display: block;
 }
 
 .thumb .play-btn {
@@ -578,44 +588,20 @@ body {
     place-items: center;
     z-index: 1;
     pointer-events: none;
-    background: transparent
+    background: transparent;
 }
 
-.thumb .play-btn::before {
-    content: "";
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, .9);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, .45)
-}
-
-.thumb .play-btn::after {
-    content: "";
-    position: absolute;
-    margin-left: 4px;
-    border-style: solid;
-    border-width: 10px 0 10px 18px;
-    border-color: transparent transparent transparent #111
-}
-
-.info-list {
-    list-style: none;
-    padding: 16px;
-    padding-bottom: var(--card-pad-y);
-    font-size: .9rem
-}
-
-.info-list li {
-    margin-bottom: 6px
-}
-
+/* Placeholder “sin vídeo” mantiene el mismo tamaño */
 .thumb.is-missing {
-    background: repeating-linear-gradient(45deg, rgba(255, 255, 255, .06) 0 10px, transparent 10px 20px), #0e0e0e;
-    border: 1px dashed rgba(255, 255, 255, .22);
     display: grid;
-    place-items: center
+    place-items: center;
+    padding: 0;
+    border: 1px dashed rgba(255, 255, 255, .22);
+    background:
+        repeating-linear-gradient(45deg, rgba(255, 255, 255, .06) 0 10px, transparent 10px 20px),
+        #0e0e0e;
 }
+
 
 .missing-label {
     font-size: .9rem;
@@ -1152,173 +1138,126 @@ body {
     filter: none
 }
 
-/* ===== CV chooser: botones al tamaño real del icono y centrados ===== */
+/* ===== CV/Breakdown – Botones simples (icono izquierda + texto derecha) ===== */
 .cv-chooser {
     display: grid;
-    gap: 16px;
-    grid-template-columns: repeat(3, max-content);
-    /* cada botón mide lo que mide su icono */
-    justify-content: center;
-    /* centra en horizontal */
-    justify-items: center;
-    /* centra cada ítem en su celda */
-    align-items: center;
-    /* alinea verticalmente los ítems */
+    grid-template-columns: repeat(3, 1fr);
+    /* Siempre 3 en desktop */
+    gap: 18px;
+    align-items: stretch;
 }
 
-/* 1 columna en pantallas estrechas */
-@media (max-width: 900px) {
-    .cv-chooser {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Botón rectangular tipo "icon_pdf", recorta al borde y añade overlay */
 .cv-pill {
-    position: relative;
-    display: inline-grid;
-    /* deja que el pseudo-elemento defina el tamaño */
-    place-items: center;
-    overflow: hidden;
-    /* recorte a las esquinas redondeadas */
+    /* contenedor del botón */
+    width: 100%;
+    height: clamp(140px, 20vw, 220px);
+    /* alto adaptable en desktop */
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 18px 20px;
     border-radius: 16px;
     border: 1px solid var(--line);
-    background: #000;
-    padding: 0;
+    background: rgba(25, 25, 25, .75);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .26), inset 0 0 0 1px rgba(255, 255, 255, .03);
     cursor: pointer;
-    transition: transform .15s ease, box-shadow .2s ease;
-}
-
-/* CLAVE: el botón toma el tamaño intrínseco del icono */
-.cv-pill::before {
-    content: var(--bg);
-    /* usa --bg:url('...') que ya pones inline */
-    display: block;
-    /* el propio icono define ancho/alto del botón */
-}
-
-/* Velo oscuro suave (como en las reels) */
-.cv-pill::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, .28);
-    transition: opacity .25s ease;
-}
-
-.cv-pill:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
-}
-
-.cv-pill:hover::after {
-    opacity: .15;
-}
-
-/* Texto centrado en blanco encima del icono */
-.cv-pill-label {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    color: #fff;
-    font-weight: 900;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    font-size: clamp(.85rem, 1.8vw, 1.1rem);
-    text-shadow: 0 2px 12px rgba(0, 0, 0, .45);
-    pointer-events: none;
-}
-
-
-/* ===== PDF modal: usar misma caja que video, pero con layout canvas + controles ===== */
-.modal-media.pdf-media {
-    display: grid;
-    grid-template-rows: 1fr auto;
-    /* canvas arriba, controles abajo */
-}
-
-.modal-media.pdf-media .cv-canvas-wrap {
+    transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease, background-color .2s ease;
     position: relative;
     overflow: hidden;
-    /* sin scroll interno */
 }
 
-.modal-media.pdf-media canvas {
-    display: block;
-    width: 100%;
-    height: auto;
+/* eliminamos cualquier overlay antiguo */
+.cv-pill::after {
+    content: none !important;
 }
 
-/* ===== CV chooser: layout teléfono sin scroll ===== */
-@media (max-width: 540px) {
+/* Icono PDF (usa --bg:url('...') que ya pones inline). Puedes cambiar el PNG/SVG. */
+.cv-pill::before {
+    content: "";
+    flex: 0 0 clamp(42px, 6vw, 72px);
+    aspect-ratio: 1;
+    border-radius: 10px;
+    background-image: var(--icon, var(--bg));
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .35);
+}
 
-    /* La sección reparte el alto: título (auto) + chooser (1fr) */
+/* Texto a la derecha (anula el estilo anterior absoluto) */
+.cv-pill-label {
+    position: static !important;
+    margin: 0;
+    color: #fff;
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    font-size: clamp(1rem, 1.6vw, 1.2rem);
+    text-shadow: none;
+    opacity: .95;
+}
+
+/* Hover/active */
+.cv-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, .38), inset 0 0 0 1px rgba(255, 255, 255, .06);
+    border-color: rgba(255, 255, 255, .2);
+    background: rgba(30, 30, 30, .9);
+}
+
+.cv-pill:active {
+    transform: translateY(0);
+}
+
+/* Accesibilidad */
+.cv-pill:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+
+/* ===== Móvil: 1 columna, 3 filas iguales que rellenan el alto visible ===== */
+@media (max-width:540px) {
     #section-cv {
         min-height: calc(100svh - var(--header-h) - var(--main-pt));
         display: grid;
         grid-template-rows: auto 1fr;
+        /* título + botones */
     }
 
     #section-cv .section-title {
         margin-bottom: 8px;
-        /* compacta el título */
         line-height: 1.2;
     }
 
-    /* El chooser ocupa todo el alto restante con 3 filas iguales */
     .cv-chooser {
         height: 100%;
-        display: grid;
         grid-template-columns: 1fr;
-        /* 1 columna */
         grid-template-rows: repeat(3, 1fr);
+        /* 3 filas iguales */
         gap: 10px;
         align-content: stretch;
         justify-items: stretch;
     }
 
-    /* Cada botón llena su fila y escala el icono sin deformar */
     .cv-pill {
-        width: 100%;
         height: 100%;
-        position: relative;
+        /* cada botón llena su fila */
         border-radius: 14px;
-        border: 1px solid var(--line);
-        overflow: hidden;
-        background-image: var(--bg);
-        /* usa el icono que ya pasas con --bg:url(...) */
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: contain;
-        /* mantiene relación de aspecto del icono */
+        padding: 16px;
+        gap: 14px;
     }
 
-    /* Anulamos el pseudo-elemento de desktop para que no fuerce tamaño */
     .cv-pill::before {
-        content: none;
+        flex: 0 0 clamp(40px, 9.5vh, 60px);
+        /* icono más grande proporcional al alto */
     }
 
-    /* Overlay y texto centrado (ya lo tienes) — ajuste de tamaño en móvil */
     .cv-pill-label {
-        font-size: clamp(.9rem, 3.4vw, 1.15rem);
+        font-size: clamp(.95rem, 3.6vw, 1.15rem);
+        letter-spacing: .14em;
     }
 }
 
-/* PDF modal: ancho/alto grandes y sin ratio 16:9 */
-#pdfModal .modal-dialog.pdf-wide {
-    aspect-ratio: auto;
-    /* anula 16:9 del modal base */
-    width: min(96vw, 1280px);
-    height: min(92vh, 92vh);
-}
-
-#pdfModal .pdf-media iframe {
-    width: 100%;
-    height: 100%;
-    border: 0;
-    background: #000;
-}
 
 /* ===== Fade de secciones (0.25s) ===== */
 .main-content>section {
@@ -1346,4 +1285,281 @@ body {
 /* Estado inicial del Fade IN (se muestra con opacity:0 y luego sube a 1) */
 .main-content>section.is-showing {
     opacity: 0;
+}
+
+/* =========================
+   CV buttons – Mobile list
+   ========================= */
+@media (max-width:540px) {
+
+    /* La sección ocupa la altura útil, título arriba y lista debajo */
+    #section-cv {
+        min-height: calc(100svh - var(--header-h) - var(--main-pt));
+        display: grid;
+        grid-template-rows: auto 1fr;
+    }
+
+    #section-cv .section-title {
+        margin-bottom: 10px;
+        line-height: 1.2;
+    }
+
+    /* Lista vertical de botones, con buen espacio entre ellos */
+    .cv-chooser {
+        display: block;
+        height: 100%;
+        overflow: hidden;
+        /* sin scroll de más */
+        padding-bottom: 2px;
+        /* micro respiro óptico */
+    }
+
+    /* Botón simple: icono a la izquierda que “encaja” a la altura del botón,
+     texto a la derecha que escala con el alto */
+    .cv-pill {
+        width: 100%;
+        min-height: clamp(64px, 14svh, 92px);
+        margin: clamp(8px, 1.8svh, 12px) 0;
+        padding: clamp(10px, 3svh, 16px) clamp(12px, 4svh, 18px);
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: rgba(25, 25, 25, .78);
+        display: flex;
+        align-items: stretch;
+        /* el icono puede ocupar el alto total */
+        gap: clamp(10px, 3svw, 16px);
+        cursor: pointer;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, .26), inset 0 0 0 1px rgba(255, 255, 255, .03);
+        transition: transform .12s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease;
+        touch-action: manipulation;
+    }
+
+    .cv-pill:active {
+        transform: translateY(1px);
+    }
+
+    /* El icono: cuadrado, encaja a la altura interna del botón */
+    .cv-pill::before {
+        content: "";
+        height: 100%;
+        aspect-ratio: 1;
+        background-image: var(--bg);
+        /* sigues usando style="--bg:url('...')" */
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+        /* respeta proporción del icono */
+        border-radius: 10px;
+        box-shadow: 0 1px 6px rgba(0, 0, 0, .25);
+    }
+
+    /* Texto adaptativo y alineado verticalmente */
+    .cv-pill-label {
+        position: static !important;
+        display: flex;
+        align-items: center;
+        color: #fff;
+        font-weight: 900;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        font-size: clamp(1rem, 4.2svw, 1.2rem);
+        line-height: 1.1;
+        opacity: .96;
+    }
+}
+
+/* =========================
+   CV buttons – Desktop wide
+   (mantiene 3 columnas que cubren el ancho)
+   ========================= */
+@media (min-width:541px) {
+    .cv-chooser {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        align-items: stretch;
+    }
+
+    .cv-pill {
+        height: clamp(120px, 18vw, 200px);
+        border-radius: 16px;
+        padding: 16px 18px;
+        display: flex;
+        align-items: center;
+        /* basta con centrar vertical en desktop */
+        gap: 18px;
+        border: 1px solid var(--line);
+        background: rgba(25, 25, 25, .75);
+        cursor: pointer;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, .26), inset 0 0 0 1px rgba(255, 255, 255, .03);
+        transition: transform .12s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease;
+    }
+
+    .cv-pill::before {
+        content: "";
+        flex: 0 0 clamp(42px, 6vw, 72px);
+        aspect-ratio: 1;
+        background-image: var(--bg);
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .35);
+    }
+
+    .cv-pill-label {
+        position: static !important;
+        color: #fff;
+        font-weight: 900;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        font-size: clamp(1rem, 1.6vw, 1.25rem);
+        line-height: 1.1;
+    }
+
+    .cv-pill:hover {
+        transform: translateY(-2px);
+        border-color: rgba(255, 255, 255, .2);
+        background: rgba(30, 30, 30, .9);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, .38), inset 0 0 0 1px rgba(255, 255, 255, .06);
+    }
+
+    .cv-pill:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 2px;
+    }
+}
+
+/* ==================================
+   Project cards – tipografía & hover
+   ================================== */
+
+/* Caja y hover más elegante */
+.card {
+    background: linear-gradient(180deg, rgba(25, 25, 25, .82) 0%, rgba(18, 18, 18, .86) 100%);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .28);
+    transition: transform .14s ease, box-shadow .22s ease, border-color .2s ease;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 255, 255, .2);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, .45);
+}
+
+/* Título black, más presencia */
+.card-title {
+    font-weight: 900;
+    /* black */
+    letter-spacing: .02em;
+    font-size: clamp(1.05rem, 1.1rem + .2vw, 1.35rem);
+    text-wrap: balance;
+}
+
+/* Subrayado sutil en hover del card */
+.card:hover .card-title {
+    text-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    /* placeholder para suavizar rendering */
+}
+
+.card-header {
+    position: relative;
+}
+
+.card-header::after {
+    content: "";
+    position: absolute;
+    left: var(--title-pad);
+    right: var(--title-pad);
+    bottom: 8px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .12), transparent);
+    opacity: .6;
+}
+
+/* Labels en “small caps/uppercase” y valores en cursiva */
+.info-list {
+    padding-top: 12px;
+}
+
+.info-list li {
+    font-style: italic;
+    /* valores en cursiva */
+    color: rgba(235, 235, 235, .9);
+}
+
+.info-list li strong {
+    font-style: normal;
+    /* label no cursiva */
+    font-weight: 800;
+    /* black-ish */
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: #fff;
+    opacity: .9;
+    margin-right: 6px;
+}
+
+/* “No video” mejor integrado */
+.thumb.is-missing {
+    background:
+        repeating-linear-gradient(45deg, rgba(255, 255, 255, .045) 0 10px, transparent 10px 20px),
+        #0e0e0e;
+    border: 1px dashed rgba(255, 255, 255, .22);
+}
+
+.missing-label {
+    font-weight: 800;
+    letter-spacing: .14em;
+}
+
+/* Play overlay un pelín más suave (consistente con el resto) */
+.thumb .play-btn::before {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .45), inset 0 0 0 1px rgba(0, 0, 0, .05);
+}
+
+/* ---- Thumbs dentro de cards: llenar 16:9 y play arriba ---- */
+.card .thumb {
+    position: relative;
+    aspect-ratio: 16/9;
+    display: block;
+    width: 100%;
+    overflow: hidden
+}
+
+.card .thumb img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    z-index: 1 !important;
+    /* imagen debajo */
+}
+
+.card .thumb .play-btn {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    z-index: 2 !important;
+    /* play por encima */
+}
+
+/* ---- Texto de la lista: sin cursiva, mismo layout ---- */
+.card .info-list li {
+    font-style: normal !important;
+}
+
+/* Distinción solo con peso/mayúsculas (sin cambiar márgenes) */
+.card .info-list li strong {
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    opacity: .95;
 }

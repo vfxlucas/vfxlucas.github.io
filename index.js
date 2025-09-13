@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     function setActive(targetId) {
-        const FADE_MS = 100; // 0.25s
+        const FADE_MS = 100; // 0.25s aprox (ajustado para sensaciones fluidas)
         const token = ++sectionAnimToken;
 
         const targetEl = sections[targetId];
@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             targetEl.classList.add("is-showing");
             targetEl.setAttribute("aria-hidden", "false");
 
-            // Inicializa los botones del CV (solo una vez)
+            // Inicializa los botones del CV (solo una vez cuando se entra)
             if (targetId === "section-cv") initCvButtonsOnce();
 
             // Forzar reflow y hacer fade-in
@@ -116,28 +116,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     /* ===== Utils: YouTube + Vimeo detection ===== */
     function getYouTubeId(input) {
         if (!input) return null;
-        if (/^[a-zA-Z0-9_-]{10,}$/.test(input)) return input;
+        if (/^[a-zA-Z0-9_-]{10,}$/.test(input)) return input; // id directo
         try {
             const url = new URL(input);
-            if (url.hostname.includes("youtu.be")) return url.pathname.slice(1);
+            if (/youtu\.be$/i.test(url.hostname)) return url.pathname.slice(1);
             if (url.searchParams.get("v")) return url.searchParams.get("v");
-            const parts = url.pathname.split("/");
+            const parts = url.pathname.split("/").filter(Boolean);
             const i = parts.indexOf("embed");
             if (i !== -1 && parts[i + 1]) return parts[i + 1];
         } catch { }
         return null;
     }
 
+    // Detección robusta de ID de Vimeo (player, video, channels, albums…)
     function getVimeoId(input) {
         if (!input) return null;
+        // Si ya parece un ID (solo dígitos suficiente largo)
+        if (/^\d{6,}$/.test(String(input))) return String(input);
         try {
             const url = new URL(input);
-            if (url.hostname.includes("vimeo.com")) {
-                const parts = url.pathname.split("/").filter(Boolean);
-                const idx = parts.indexOf("video");
-                if (idx !== -1 && parts[idx + 1]) return parts[idx + 1];
-                if (parts.length >= 1 && /^\d+$/.test(parts[0])) return parts[0];
-            }
+            if (!/vimeo\.com/i.test(url.hostname)) return null;
+            const path = url.pathname.replace(/\/+/g, "/");
+            // player.vimeo.com/video/ID
+            let m = path.match(/\/video\/(\d+)/);
+            if (m) return m[1];
+            // vimeo.com/channels/xxx/ID  | vimeo.com/album/ALBUMID/video/ID
+            m = path.match(/\/(?:channels\/[^/]+|album\/\d+\/video)\/(\d+)/);
+            if (m) return m[1];
+            // vimeo.com/ID al final
+            m = path.match(/\/(\d+)(?:$|[/?#])/);
+            if (m) return m[1];
         } catch { }
         return null;
     }
@@ -149,33 +157,112 @@ document.addEventListener("DOMContentLoaded", async () => {
         return `<li class="${isChange ? "is-missing" : ""}"><strong>${label}:</strong> ${v}</li>`;
     }
 
+    /* ===============================
+       Thumbnails: YouTube + Vimeo
+       =============================== */
+
+    // Intenta mejorar la calidad de la miniatura de Vimeo cuando es posible
+    function upgradeVimeoThumb(u) {
+        if (!u) return u;
+        let url = u.replace(/^http:\/\//i, "https://");
+        // En i.vimeocdn.com suele haber sufijos con tamaño. Forzamos _640 si existe un sufijo numérico.
+        // Ej: ..._295x166.jpg  -> ..._640.jpg  |  ..._200.jpg -> ..._640.jpg
+        url = url.replace(/_(\d+x\d+|\d+)(?=\.(jpg|png)$)/i, "_640");
+        return url;
+    }
+
+    async function fetchVimeoThumb(vimeoUrlOrId) {
+        // Acepta ID o URL
+        let url = (vimeoUrlOrId || "").toString();
+        if (!/vimeo\.com/i.test(url)) url = `https://vimeo.com/${url}`;
+        const oembed = `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`;
+        const noembed = `https://noembed.com/embed?url=${encodeURIComponent(url)}`;
+
+        // 1) Vimeo oEmbed oficial
+        try {
+            const res = await fetch(oembed, { cache: "no-store" });
+            if (!res.ok) throw new Error(res.statusText);
+            const data = await res.json();
+            if (data && data.thumbnail_url) return upgradeVimeoThumb(data.thumbnail_url);
+        } catch (e) {
+            // sigue al fallback
+        }
+
+        // 2) Fallback: noembed (suele devolver thumbnail_url también)
+        try {
+            const res = await fetch(noembed, { cache: "no-store" });
+            if (!res.ok) throw new Error(res.statusText);
+            const data = await res.json();
+            if (data && data.thumbnail_url) return upgradeVimeoThumb(data.thumbnail_url);
+        } catch (e) {
+            console.warn("No se pudo obtener thumbnail de Vimeo vía oEmbed ni noembed:", e);
+        }
+
+        return null;
+    }
+
+    function injectThumbIntoButton(btn, thumbUrl, alt) {
+        if (!btn || !thumbUrl) return;
+        btn.innerHTML = `
+        <img src="${thumbUrl}" alt="${alt || "Project thumbnail"}" loading="lazy">
+        <div class="play-btn"></div>
+    `;
+    }
+
+    async function loadVimeoThumbsAfterRender() {
+        const vimeoBtns = document.querySelectorAll('.thumb[data-vimeo]:not(.has-thumb)');
+        await Promise.all(Array.from(vimeoBtns).map(async (btn) => {
+            const src = btn.getAttribute('data-vimeo');
+            const title = btn.closest('.card')?.querySelector('.card-title')?.textContent || "Project";
+            const idOrUrl = getVimeoId(src) || src;
+            const fullUrl = /^\d+$/.test(idOrUrl) ? `https://vimeo.com/${idOrUrl}` : idOrUrl;
+            const thumb = await fetchVimeoThumb(fullUrl);
+            if (thumb) {
+                injectThumbIntoButton(btn, thumb, `${title} thumbnail`);
+                btn.classList.add('has-thumb');
+            } else {
+                // fallback visual si no conseguimos thumb
+                btn.classList.add('has-thumb');
+                btn.innerHTML = `
+                  <div style="width:100%;height:100%;background:
+                    repeating-linear-gradient(45deg, rgba(255,255,255,.06) 0 10px, transparent 10px 20px), #0e0e0e;"></div>
+                  <div class="play-btn"></div>
+                `;
+            }
+        }));
+    }
+
+    /* ===== Card builder (acepta YouTube o Vimeo en `youtube_url`) ===== */
     function makeCard(p) {
-        const ytId =
-            getYouTubeId(p.youtube_id) ||
-            getYouTubeId(p.youtube_url) ||
-            getYouTubeId(p.youtube);
+        // 1) Fuente única: usamos SIEMPRE `youtube_url` (puede ser YT o Vimeo).
+        //    Si no viene, caemos a otros campos opcionales por compatibilidad.
+        const vidSrc =
+            (p.youtube_url || p.video_url || p.vimeo_url || p.youtube || p.vimeo || "").trim();
 
-        const vimeoId =
-            getVimeoId(p.vimeo_id) ||
-            getVimeoId(p.vimeo_url) ||
-            getVimeoId(p.vimeo) ||
-            getVimeoId(p.video_url);
+        // 2) Detectamos IDs según proveedor a partir del MISMO campo
+        const ytId = getYouTubeId(vidSrc);
+        const vimeoId = getVimeoId(vidSrc);
 
-        const rawUrl = (p.video_url || "").trim();
+        // 3) URL final de reproducción
         let videoUrl = "";
-
-        if (rawUrl && /vimeo\.com/i.test(rawUrl)) {
-            videoUrl = rawUrl; // respeta la URL exacta
+        if (/vimeo\.com/i.test(vidSrc)) {
+            // Si ya es una URL de Vimeo, respétala tal cual
+            videoUrl = vidSrc;
         } else if (vimeoId) {
             videoUrl = `https://vimeo.com/${vimeoId}`;
         } else if (ytId) {
             videoUrl = `https://www.youtube.com/watch?v=${ytId}`;
-        } else {
-            videoUrl = rawUrl;
+        } else if (vidSrc) {
+            // Alguna otra URL de vídeo
+            videoUrl = vidSrc;
         }
 
-        // Thumbnail
+        // 4) Thumbnail:
+        //    - YouTube: miniatura directa
+        //    - Vimeo: se resuelve asíncronamente vía oEmbed/noembed (ya lo haces en loadVimeoThumbsAfterRender)
+        //    - Fallback: placeholder si no hay vídeo
         let thumbHtml = "";
+
         if (ytId) {
             thumbHtml = `
       <button class="thumb thumb--clean" type="button" data-video="${videoUrl}">
@@ -183,19 +270,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="play-btn"></div>
       </button>`;
         } else if (p.thumb) {
+            // Si has provisto una imagen custom de thumb
             thumbHtml = `
       <button class="thumb thumb--clean" type="button" data-video="${videoUrl}">
         <img src="${p.thumb}" alt="${p.title || "Project"} thumbnail" loading="lazy">
         <div class="play-btn"></div>
       </button>`;
-        } else if (videoUrl) {
-            // Si es Vimeo y no hay thumb, marcamos para cargar miniatura oEmbed
-            const vimeoMark = /vimeo\.com/i.test(videoUrl) ? ` data-vimeo="${vimeoId || videoUrl}"` : "";
+        } else if (vimeoId || /vimeo\.com/i.test(videoUrl)) {
+            // Marcamos para que `loadVimeoThumbsAfterRender()` pinte la miniatura tras el render
+            const mark = vimeoId ? vimeoId : videoUrl;
             thumbHtml = `
-      <button class="thumb thumb--clean" type="button" data-video="${videoUrl}"${vimeoMark}>
+      <button class="thumb thumb--clean" type="button" data-video="${videoUrl}" data-vimeo="${mark}">
+        <div class="play-btn"></div>
+      </button>`;
+        } else if (videoUrl) {
+            // Otro proveedor: placeholder clicable
+            thumbHtml = `
+      <button class="thumb thumb--clean" type="button" data-video="${videoUrl}">
         <div class="play-btn"></div>
       </button>`;
         } else {
+            // Sin vídeo
             thumbHtml = `
       <div class="thumb is-missing" aria-disabled="true" title="No video provided">
         <span class="missing-label">NO VIDEO</span>
@@ -212,48 +307,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         ${makeInfo("Studio", p.studio)}
         ${makeInfo("Comp Supervisor", p.comp_supervisor)}
         ${makeInfo("Comp Lead", p.comp_lead)}
-        ${makeInfo("My role", p.role)}
+        ${makeInfo("Role", p.role)}
         ${makeInfo("Software", p.software)}
       </ul>
     </article>`;
     }
 
-    async function fetchVimeoThumb(vimeoUrlOrId) {
-        let url = (vimeoUrlOrId || "").toString();
-        if (!/vimeo\.com/i.test(url)) url = `https://vimeo.com/${url}`;
-        const oembed = `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`;
-
-        try {
-            const res = await fetch(oembed, { cache: "no-store" });
-            if (!res.ok) throw new Error(res.statusText);
-            const data = await res.json();
-            return data.thumbnail_url || null;
-        } catch (e) {
-            console.warn("Vimeo oEmbed thumb failed:", e);
-            return null;
-        }
-    }
-
-    function injectThumbIntoButton(btn, thumbUrl, alt) {
-        if (!btn || !thumbUrl) return;
-        btn.innerHTML = `
-        <img src="${thumbUrl}" alt="${alt || "Project thumbnail"}" loading="lazy">
-        <div class="play-btn"></div>
-    `;
-    }
-
-    async function loadVimeoThumbsAfterRender() {
-        const vimeoBtns = document.querySelectorAll('.thumb[data-vimeo]:not(.has-thumb)');
-        await Promise.all(Array.from(vimeoBtns).map(async (btn) => {
-            const src = btn.getAttribute('data-vimeo');
-            const title = btn.closest('.card')?.querySelector('.card-title')?.textContent || "Project";
-            const thumb = await fetchVimeoThumb(src);
-            if (thumb) {
-                injectThumbIntoButton(btn, thumb, `${title} thumbnail`);
-                btn.classList.add('has-thumb');
-            }
-        }));
-    }
 
     /* ===== CARGA Y RENDER (Animation / VFX) ===== */
     const gridAnim = document.getElementById("gridAnimation");
@@ -278,7 +337,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             });
 
-            // Cargar miniaturas de Vimeo de forma asíncrona
+            // Cargar miniaturas de Vimeo de forma asíncrona (tras pintar)
             await loadVimeoThumbsAfterRender();
 
             // Click en los thumbnails con video
