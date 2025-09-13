@@ -766,3 +766,18 @@ body {
         opacity: 1;
     }
 }
+
+/* Centrar títulos en los cards de proyectos (Animation y VFX) */
+#section-animation .card-header,
+#section-vfx .card-header {
+    text-align: center;
+    /* centra horizontalmente */
+}
+
+#section-animation .card-title,
+#section-vfx .card-title {
+    text-align: center;
+    /* centra el texto */
+    margin-inline: auto;
+    /* por si el navegador aplica ancho intrínseco */
+}
