@@ -733,15 +733,18 @@ body {
     list-style: none;
     display: flex;
     align-items: center;
+    justify-content: center; 
     gap: 14px;
-    margin-top: 4px
+    margin: 4px 0 0;         
+    padding: 0;              
+    padding-inline-start: 0;
 }
 
 .social-list img {
     width: 26px;
     height: 26px;
     display: block;
-    filter: none
+    filter: none;
 }
 
 /* Bio (derecha) */
@@ -1118,24 +1121,6 @@ body {
 .btn-primary:focus-visible {
     outline: 2px solid #fff;
     outline-offset: 2px
-}
-
-/* Redes: centradas también */
-.social-list {
-    list-style: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* <- centrado */
-    gap: 14px;
-    margin-top: 4px;
-}
-
-.social-list img {
-    width: 26px;
-    height: 26px;
-    display: block;
-    filter: none
 }
 
 /* ===== CV/Breakdown – Botones simples (icono izquierda + texto derecha) ===== */
@@ -1631,6 +1616,10 @@ body {
     font-size: clamp(1rem, 1.6vw, 1.15rem);
     line-height: 1.15;
     opacity: .95;
+
+    display: block;
+    width: 100%;
+    text-align: center;
 }
 
 /* Móvil */
@@ -1652,15 +1641,64 @@ body {
 
 /* Desktop only: centrar verticalmente el panel de botones del breakdown */
 @media (min-width: 860px) {
-  #section-cv {
-    /* ocupa la altura útil bajo el header */
-    min-height: calc(100vh - var(--header-h) - var(--main-pt));
-    min-height: calc(100svh - var(--header-h) - var(--main-pt)); /* mejor en móviles modernos */
-    display: grid;
-    grid-template-rows: auto 1fr; /* fila 1: título | fila 2: zona para centrar los botones */
-  }
+    #section-cv {
+        /* ocupa la altura útil bajo el header */
+        min-height: calc(100vh - var(--header-h) - var(--main-pt));
+        min-height: calc(100svh - var(--header-h) - var(--main-pt));
+        /* mejor en móviles modernos */
+        display: grid;
+        grid-template-rows: auto 1fr;
+        /* fila 1: título | fila 2: zona para centrar los botones */
+    }
 
-  #section-cv .cv-chooser {
-    margin-top: 16rem; /* reparte el espacio libre arriba/abajo por igual */
-  }
+    #section-cv .cv-chooser {
+        margin-top: 16rem;
+        /* reparte el espacio libre arriba/abajo por igual */
+    }
+}
+
+/* Asegura orden de capas y fade in/out del botón */
+.card .thumb img {
+    z-index: 1 !important;
+    cursor: pointer;
+    transition: filter .25s ease, transform .25s ease;
+}
+
+.card .thumb:hover img {
+    filter: blur(2px) saturate(.95) brightness(.9);
+    transform: scale(1.01);
+}
+
+.card .thumb .play-btn {
+    z-index: 2 !important;
+    /* por encima de la miniatura */
+    opacity: 0;
+    transform: scale(.98);
+    transition: opacity .25s ease, transform .25s ease;
+}
+
+/* Dibuja el icono de play (círculo + triángulo) */
+.card .thumb .play-btn::before {
+    content: "";
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .95);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .45), inset 0 0 0 1px rgba(0, 0, 0, .05);
+}
+
+.card .thumb .play-btn::after {
+    content: "";
+    position: absolute;
+    margin-left: 6px;
+    border-style: solid;
+    border-width: 14px 0 14px 22px;
+    border-color: transparent transparent transparent #111;
+}
+
+/* Mostrar al hacer hover o con focus del teclado */
+.card .thumb:hover .play-btn,
+.card .thumb:focus-visible .play-btn {
+    opacity: 1;
+    transform: scale(1);
 }
