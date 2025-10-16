@@ -733,10 +733,10 @@ body {
     list-style: none;
     display: flex;
     align-items: center;
-    justify-content: center; 
+    justify-content: center;
     gap: 14px;
-    margin: 4px 0 0;         
-    padding: 0;              
+    margin: 4px 0 0;
+    padding: 0;
     padding-inline-start: 0;
 }
 
@@ -1701,4 +1701,20 @@ body {
 .card .thumb:focus-visible .play-btn {
     opacity: 1;
     transform: scale(1);
+}
+
+/* MOBILE ONLY: mostrar siempre el play en los thumbs de las cards */
+@media (hover: none) and (pointer: coarse) {
+    .card .thumb .play-btn {
+        opacity: 1 !important;
+        transform: scale(1) !important;
+    }
+}
+
+/* Fallback por anchura (por si el UA no informa touch correctamente) */
+@media (max-width: 540px) {
+    .card .thumb .play-btn {
+        opacity: 1 !important;
+        transform: scale(1) !important;
+    }
 }
