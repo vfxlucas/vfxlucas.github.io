@@ -1718,3 +1718,27 @@ body {
         transform: scale(1) !important;
     }
 }
+
+.email-copy {
+    display: inline-block;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: #1f1f1f;
+    color: #ffffff;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+
+    cursor: text;
+    user-select: text;
+}
+
+.email-copy:hover {
+    background: #2a2a2a;
+}
+
+.email-copy::selection {
+    background: rgba(255, 255, 255, 0.2);
+}
