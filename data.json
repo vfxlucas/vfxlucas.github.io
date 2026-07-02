@@ -72,7 +72,18 @@
         "youtube_url": "https://youtu.be/qCcB33X_xCY",
         "type": "vfx"
     },
-   
+    {
+        "title": "Black Sad",
+        "studio": "Illusorium Studios",
+        "year": "2024-2025",
+        "directed_by": "James A. Castillo",
+        "comp_supervisor": "Daniel López Reina",
+        "comp_lead": "Miriam Peralta",
+        "role": "3D Compositor",
+        "software": "Nuke",
+        "youtube_url": "https://youtu.be/t3qnuVscDes?si=z-pAKcY7xcwwctYl",
+        "type": "animation"
+    },
     {
         "title": "The Quinta's Ghost",
         "studio": "Illusorium Studios",
@@ -85,6 +96,7 @@
         "youtube_url": "https://www.youtube.com/watch?v=25_RHP3UB70",
         "type": "animation"
     },
+   
     {
         "title": "Marathon",
         "studio": "Illusorium Studios",
